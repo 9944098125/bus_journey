@@ -1,5 +1,6 @@
+import { api } from 'app/slice';
+import { registerApi } from 'app/pages/Register/slice';
 import { GlobalState } from 'app/slice/types';
-import { initialState } from 'app/slice';
 import { RegisterState } from 'app/pages/Register/slice/types';
 // [IMPORT NEW CONTAINERSTATE ABOVE] < Needed for generating containers seamlessly
 
@@ -8,8 +9,8 @@ import { RegisterState } from 'app/pages/Register/slice/types';
   You have to declare them here manually
 */
 export interface RootState {
-  globalApi: any;
-  registerApi: any;
+  [api.reducerPath]: ReturnType<typeof api.reducer>;
+  [registerApi.reducerPath]: ReturnType<typeof registerApi.reducer>;
   global?: GlobalState;
   register?: RegisterState;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for generating containers seamlessly

@@ -31,10 +31,6 @@ export function RegisterNameEmailFields({
             className={cn(INPUT_CLASS, 'pl-11', errors.full_name && 'border-red-400')}
             {...register('full_name', {
               required: 'Full name is required',
-              maxLength: {
-                value: 40,
-                message: 'Name cannot exceed 40 characters',
-              },
               minLength: {
                 value: 2,
                 message: 'Name must be at least 2 characters',
@@ -62,8 +58,8 @@ export function RegisterNameEmailFields({
             {...register('email', {
               required: 'Email is required',
               maxLength: {
-                value: 20,
-                message: 'Email cannot exceed 20 characters',
+                value: 30,
+                message: 'Email cannot exceed 30 characters',
               },
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,

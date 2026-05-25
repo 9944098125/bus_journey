@@ -60,7 +60,8 @@ export function useRegisterForm() {
 
     toast({
       title: 'Welcome aboard!',
-      description: 'Your registration was completed successfully.',
+      description:
+        'Check your email for the activation link. After that, you can sign in here with your password.',
     });
     navigate('/login');
   }, [isRegistered, navigate]);

@@ -13,6 +13,12 @@
 	"author": "",
 	"license": "ISC",
 	"packageManager": "pnpm@10.27.0",
+	"pnpm": {
+		"overrides": {
+			"webpack": "5.107.1",
+			"@types/minimatch": "5.1.2"
+		}
+	},
 	"devDependencies": {
 		"turbo": "^2.9.14"
 	}

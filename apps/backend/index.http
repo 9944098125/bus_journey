@@ -11,16 +11,16 @@ POST http://127.0.0.1:5001/api/users/register
 Content-Type: application/json
 
 {
-  "full_name": "Satyanarayana Akella",
-  "email": "akella.satyanarayana2@gmail.com",
+  "full_name": "Srinivas Akella",
+  "email": "srinivas72075@gmail.com",
   "country_code": "+91",
-  "phone_number": "8985723593",
-  "password": "Satyanarayana@13",
+  "phone_number": "7013523029",
+  "password": "SrinivasAkella@14",
   "role": "ADMIN"
 }
 
-##### FIRST LOGIN (paste token from register response loginLink query param)
-GET http://127.0.0.1:5001/api/users/login/verify?token=PASTE_TOKEN_HERE
+##### FIRST LOGIN (paste token from activation email link)
+GET http://127.0.0.1:5001/api/users/login/verify?token=PASTE_TOKEN_FROM_EMAIL
 
 ##### PASSWORD LOGIN (only works after first-login verify)
 POST http://127.0.0.1:5001/api/users/login

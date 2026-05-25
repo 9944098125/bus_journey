@@ -11,7 +11,7 @@ export class UserRepository {
      */
     async findUserByEmail(email) {
         return Users.findOne({
-            email,
+            email: email.trim().toLowerCase(),
         });
     }
     /**

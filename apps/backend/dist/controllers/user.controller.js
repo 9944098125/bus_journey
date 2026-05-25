@@ -6,15 +6,30 @@ export class UserController {
      */
     async registerUser(req, res, next) {
         try {
-            const { user, loginLink } = await this.userService.registerUser(req.body);
+            const { user, emailSent } = await this.userService.registerUser(req.body);
             res.status(201).json({
                 success: true,
-                message: "User registered successfully. Use the login link to activate your account.",
+                message: "User registered successfully. Check your email for the activation link.",
                 data: user,
-                loginLink,
+                emailSent,
             });
         }
         catch (error) {
+            if (error instanceof Error &&
+                (error.message === "Email already exists" ||
+                    error.message === "Phone number already exists" ||
+                    error.message.startsWith("Email is not configured") ||
+                    error.message.startsWith("Failed to send activation email"))) {
+                const status = error.message === "Email already exists" ||
+                    error.message === "Phone number already exists"
+                    ? 409
+                    : 503;
+                res.status(status).json({
+                    success: false,
+                    message: error.message,
+                });
+                return;
+            }
             next(error);
         }
     }

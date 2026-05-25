@@ -3,57 +3,140 @@
 > bus_journey@0.1.0 build /Users/srini/Desktop/Projects/MERN_Stack_Projects/bus_journey/apps/frontend
 > cross-env NODE_ENV=production react-app-rewired build
 
-(node:28635) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(node:13460) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
 (Use `node --trace-deprecation ...` to show where the warning was created)
 Creating an optimized production build...
-Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
-  npx update-browserslist-db@latest
-  Why you should do it regularly: https://github.com/browserslist/update-db#readme
 
 [1m[33mwarn[39m[22m - The class `ease-[cubic-bezier(0.34,1.2,0.64,1)]` is ambiguous and matches multiple utilities.
 [1m[33mwarn[39m[22m - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(0.34,1.2,0.64,1)&rsqb;` to silence this warning.
-
-[1m[33mwarn[39m[22m - The class `ease-[cubic-bezier(0.4,0,0.2,1)]` is ambiguous and matches multiple utilities.
-[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb;` to silence this warning.
-Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
-  npx update-browserslist-db@latest
-  Why you should do it regularly: https://github.com/browserslist/update-db#readme
-Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
-  npx update-browserslist-db@latest
-  Why you should do it regularly: https://github.com/browserslist/update-db#readme
 [33mCompiled with warnings.[39m
 [33m[39m
 [eslint] 
-src/app/components/layout/components/sidebar.tsx
-  [1mLine 1:16:[22m    Replace `·useCallback,·useEffect,·useMemo,·useRef,·useState·` with `⏎··useCallback,⏎··useEffect,⏎··useMemo,⏎··useRef,⏎··useState,⏎`                                        [33m[4mprettier/prettier[24m[39m
-  [1mLine 108:32:[22m  Delete `⏎···········`                                                                                                                                                      [33m[4mprettier/prettier[24m[39m
-  [1mLine 295:41:[22m  Replace `⏎··················collapsed,⏎··················showExpandedLabels,⏎··················isActive,⏎················` with `collapsed,·showExpandedLabels,·isActive`  [33m[4mprettier/prettier[24m[39m
+src/app/components/layout/components/navbar.tsx
+  [1mLine 48:9:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 49:11:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 50:1:[22m   Replace `············` with `··············`      [33m[4mprettier/prettier[24m[39m
+  [1mLine 52:13:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 53:1:[22m   Replace `··············` with `················`  [33m[4mprettier/prettier[24m[39m
+  [1mLine 54:1:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 55:1:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 56:13:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 57:1:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 59:11:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 60:1:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 61:15:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 62:13:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 64:1:[22m   Replace `············` with `··············`      [33m[4mprettier/prettier[24m[39m
+  [1mLine 65:15:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 66:13:[22m  Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 67:1:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
+  [1mLine 68:1:[22m   Insert `··`                                       [33m[4mprettier/prettier[24m[39m
 
-src/app/components/ui/input.tsx
-  [1mLine 5:28:[22m  Delete `⏎·`  [33m[4mprettier/prettier[24m[39m
+src/app/components/layout/sidebar-context.tsx
+  [1mLine 47:50:[22m  Replace `·readStored(SIDEBAR_OPEN_KEY,·true)` with `⏎····readStored(SIDEBAR_OPEN_KEY,·true),⏎··`                                           [33m[4mprettier/prettier[24m[39m
+  [1mLine 49:50:[22m  Replace `·readStored(SIDEBAR_DARK_KEY,·false)` with `⏎····readStored(SIDEBAR_DARK_KEY,·false),⏎··`                                         [33m[4mprettier/prettier[24m[39m
+  [1mLine 70:37:[22m  Replace `()·=>·setIsLoadingState(false),·SIDEBAR_LOADING_MS` with `⏎······()·=>·setIsLoadingState(false),⏎······SIDEBAR_LOADING_MS,⏎····`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/layout/sidebar/Sidebar.tsx
+  [1mLine 159:11:[22m  Replace `·className="travel-sidebar-glow·pointer-events-none·absolute·inset-0"·aria-hidden` with `⏎········className="travel-sidebar-glow·pointer-events-none·absolute·inset-0"⏎········aria-hidden⏎·····`          [33m[4mprettier/prettier[24m[39m
+  [1mLine 160:11:[22m  Replace `·className="travel-sidebar-mesh·pointer-events-none·absolute·inset-0"·aria-hidden` with `⏎········className="travel-sidebar-mesh·pointer-events-none·absolute·inset-0"⏎········aria-hidden⏎·····`          [33m[4mprettier/prettier[24m[39m
+  [1mLine 161:11:[22m  Replace `·className="travel-sidebar-shine·pointer-events-none·absolute·inset-0"·aria-hidden` with `⏎········className="travel-sidebar-shine·pointer-events-none·absolute·inset-0"⏎········aria-hidden⏎·····`        [33m[4mprettier/prettier[24m[39m
+  [1mLine 249:13:[22m  Replace `·className="travel-sidebar-glow·pointer-events-none·absolute·inset-0"·aria-hidden` with `⏎··········className="travel-sidebar-glow·pointer-events-none·absolute·inset-0"⏎··········aria-hidden⏎·······`    [33m[4mprettier/prettier[24m[39m
+  [1mLine 250:13:[22m  Replace `·className="travel-sidebar-mesh·pointer-events-none·absolute·inset-0"·aria-hidden` with `⏎··········className="travel-sidebar-mesh·pointer-events-none·absolute·inset-0"⏎··········aria-hidden⏎·······`    [33m[4mprettier/prettier[24m[39m
+  [1mLine 251:13:[22m  Replace `·className="travel-sidebar-shine·pointer-events-none·absolute·inset-0"·aria-hidden` with `⏎··········className="travel-sidebar-shine·pointer-events-none·absolute·inset-0"⏎··········aria-hidden⏎·······`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/layout/sidebar/SidebarBrand.tsx
+  [1mLine 15:39:[22m  Replace `·collapsed,·isLoading·` with `⏎··collapsed,⏎··isLoading,⏎`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/layout/sidebar/SidebarGroup.tsx
+  [1mLine 42:7:[22m  The element ul has an implicit role of list. Defining this explicitly is redundant and should be avoided  [33m[4mjsx-a11y/no-redundant-roles[24m[39m
+
+src/app/components/layout/sidebar/SidebarItem.tsx
+  [1mLine 48:11:[22m   Delete `··`                                                                                                                                                                                                                 [33m[4mprettier/prettier[24m[39m
+  [1mLine 49:1:[22m    Delete `··`                                                                                                                                                                                                                 [33m[4mprettier/prettier[24m[39m
+  [1mLine 126:23:[22m  Replace `·?·'text-white'` with `⏎················?·'text-white'⏎···············`                                                                                                                                            [33m[4mprettier/prettier[24m[39m
+  [1mLine 135:14:[22m  Replace `·className={cn('relative·z-[1]',·collapsed·&&·'absolute·right-1·top-1')}` with `⏎··········className={cn(⏎············'relative·z-[1]',⏎············collapsed·&&·'absolute·right-1·top-1',⏎··········)}⏎········`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/layout/sidebar/SidebarProfile.tsx
+  [1mLine 112:65:[22m  Replace `{profile.email}` with `⏎················{profile.email}⏎··············`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/layout/sidebar/SidebarRecent.tsx
+  [1mLine 41:7:[22m  The element ul has an implicit role of list. Defining this explicitly is redundant and should be avoided  [33m[4mjsx-a11y/no-redundant-roles[24m[39m
+
+src/app/components/layout/sidebar/SidebarSkeleton.tsx
+  [1mLine 23:25:[22m  Replace `'flex·items-center·gap-3',·collapsed·&&·'justify-center'` with `⏎············'flex·items-center·gap-3',⏎············collapsed·&&·'justify-center',⏎··········`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/layout/sidebar/use-recent-routes.ts
+  [1mLine 4:9:[22m  Replace `⏎··MAX_RECENT_ROUTES,⏎··SIDEBAR_RECENT_KEY,⏎` with `·MAX_RECENT_ROUTES,·SIDEBAR_RECENT_KEY·`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/ui/button.tsx
+  [1mLine 54:10:[22m  Delete `⏎···`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/ui/sheet.tsx
+  [1mLine 4:10:[22m  'X' is defined but never used  [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+
+src/app/components/ui/skeleton.tsx
+  [1mLine 9:21:[22m  Replace `⏎········'animate-pulse·rounded-2xl·bg-white/12',⏎········className,⏎······` with `'animate-pulse·rounded-2xl·bg-white/12',·className`  [33m[4mprettier/prettier[24m[39m
 
 src/app/pages/Login/components/LoginForm.tsx
-  [1mLine 61:29:[22m  Replace `⏎··············register={register}⏎··············errors={errors}⏎··············isActive⏎···········` with `·register={register}·errors={errors}·isActive`  [33m[4mprettier/prettier[24m[39m
+  [1mLine 73:9:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 74:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 75:11:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 76:1:[22m    Replace `··········` with `············`                                                                                                                                                                                      [33m[4mprettier/prettier[24m[39m
+  [1mLine 77:9:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 78:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 79:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 80:13:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 81:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 83:11:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 84:1:[22m    Replace `············<LoginEmailField⏎··············register={register}⏎··············errors={errors}⏎··············isActive⏎···········` with `··············<LoginEmailField·register={register}·errors={errors}·isActive`  [33m[4mprettier/prettier[24m[39m
+  [1mLine 89:11:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 90:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 91:15:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 92:1:[22m    Replace `··············` with `················`                                                                                                                                                                              [33m[4mprettier/prettier[24m[39m
+  [1mLine 93:15:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 94:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 95:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 96:11:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 98:1:[22m    Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 99:13:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 100:1:[22m   Replace `············` with `··············`                                                                                                                                                                                  [33m[4mprettier/prettier[24m[39m
+  [1mLine 101:1:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 102:1:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 103:1:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 105:11:[22m  Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 107:11:[22m  Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+  [1mLine 108:1:[22m   Insert `··`                                                                                                                                                                                                                   [33m[4mprettier/prettier[24m[39m
+
+src/app/pages/Login/hooks/useLoginForm.ts
+  [1mLine 92:19:[22m   Insert `⏎·······`                                                                                                               [33m[4mprettier/prettier[24m[39m
+  [1mLine 95:6:[22m    React Hook useEffect has a missing dependency: 'clearActivationTokenFromUrl'. Either include it or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+  [1mLine 107:34:[22m  Replace `⏎······.toLowerCase()⏎······` with `.toLowerCase()`                                                                    [33m[4mprettier/prettier[24m[39m
+  [1mLine 121:6:[22m   React Hook useEffect has a missing dependency: 'clearActivationTokenFromUrl'. Either include it or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+  [1mLine 163:17:[22m  Delete `⏎···`                                                                                                                   [33m[4mprettier/prettier[24m[39m
 
 src/app/pages/Register/components/RegisterNameEmailFields.tsx
   [1mLine 31:27:[22m  Replace `INPUT_CLASS,·'pl-11',·errors.full_name·&&·'border-red-400'` with `⏎··············INPUT_CLASS,⏎··············'pl-11',⏎··············errors.full_name·&&·'border-red-400',⏎············`  [33m[4mprettier/prettier[24m[39m
-  [1mLine 61:27:[22m  Replace `INPUT_CLASS,·'pl-11',·errors.email·&&·'border-red-400'` with `⏎··············INPUT_CLASS,⏎··············'pl-11',⏎··············errors.email·&&·'border-red-400',⏎············`          [33m[4mprettier/prettier[24m[39m
+  [1mLine 57:27:[22m  Replace `INPUT_CLASS,·'pl-11',·errors.email·&&·'border-red-400'` with `⏎··············INPUT_CLASS,⏎··············'pl-11',⏎··············errors.email·&&·'border-red-400',⏎············`          [33m[4mprettier/prettier[24m[39m
 
 src/app/pages/Register/components/RegisterPasswordFields.tsx
   [1mLine 98:25:[22m  Replace `⏎··············showConfirmPassword·?·'Hide·password'·:·'Show·password'⏎············` with `showConfirmPassword·?·'Hide·password'·:·'Show·password'`  [33m[4mprettier/prettier[24m[39m
+
+src/app/slice/index.ts
+  [1mLine 90:76:[22m  Replace `token` with `⏎··········token,⏎········`  [33m[4mprettier/prettier[24m[39m
 
 Search for the [4m[33mkeywords[39m[24m to learn more about each warning.
 To ignore, add [36m// eslint-disable-next-line[39m to the line before.
 
 File sizes after gzip:
 
-  175.31 kB  [2mbuild/static/js/[22m[36mmain.b1636154.js[39m
-  28.43 kB   [2mbuild/static/js/[22m[36m478.af3938b4.chunk.js[39m
-  24.35 kB   [2mbuild/static/css/[22m[36m478.8873206a.chunk.css[39m
-  10.73 kB   [2mbuild/static/css/[22m[36mmain.e096db63.css[39m
-  5.73 kB    [2mbuild/static/js/[22m[36m902.1eeb3705.chunk.js[39m
-  4.61 kB    [2mbuild/static/js/[22m[36m643.f4f25520.chunk.js[39m
-  436 B      [2mbuild/static/js/[22m[36m266.79239831.chunk.js[39m
+  237.46 kB  [2mbuild/static/js/[22m[36mmain.d47a3a17.js[39m
+  27.63 kB   [2mbuild/static/js/[22m[36m222.8476f3f8.chunk.js[39m
+  24.35 kB   [2mbuild/static/css/[22m[36m222.10ce2bdb.chunk.css[39m
+  12.45 kB   [2mbuild/static/css/[22m[36mmain.200cc018.css[39m
+  6.87 kB    [2mbuild/static/js/[22m[36m618.d1e9ad63.chunk.js[39m
+  6.15 kB    [2mbuild/static/js/[22m[36m562.95e2fee6.chunk.js[39m
+  436 B      [2mbuild/static/js/[22m[36m668.36381552.chunk.js[39m
 
 The project was built assuming it is hosted at [32m/[39m.
 You can control this with the [32mhomepage[39m field in your [36mpackage.json[39m.

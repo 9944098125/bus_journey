@@ -4,6 +4,7 @@ import type { Server } from "http";
 
 import app from "./app.js";
 import { connectDatabase } from "./config/database.js";
+import { getMailTransporter } from "./config/mailer.js";
 
 const FALLBACK_PORTS = [5001, 5005] as const;
 
@@ -41,6 +42,16 @@ const listenOnPort = (port: number): Promise<Server> =>
 const startServer = async (): Promise<void> => {
 	try {
 		await connectDatabase();
+
+		try {
+			await getMailTransporter().verify();
+			console.log("✉️  SMTP ready — activation emails will be sent on register");
+		} catch (emailError) {
+			console.warn(
+				"⚠️  SMTP not ready — registration emails will fail until .env is fixed:",
+				emailError instanceof Error ? emailError.message : emailError,
+			);
+		}
 
 		let server: Server | undefined;
 		let activePort: number | undefined;

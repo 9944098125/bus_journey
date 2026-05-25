@@ -11,21 +11,23 @@ import type {
 } from "../interfaces/user.interface.js";
 
 import { UserRepository } from "../repositories/user.repository.js";
+import { EmailService } from "./email.service.js";
 
 import { buildFirstLoginLink } from "../utils/loginLink.js";
 import { signFirstLoginToken, signToken } from "../utils/jwt.js";
 
 export class UserService {
 	private readonly userRepository = new UserRepository();
+	private readonly emailService = new EmailService();
 
 	/**
 	 * Register user
 	 */
 
 	public async registerUser(data: Partial<IUser>) {
-		const existingEmail = await this.userRepository.findUserByEmail(
-			data.email as string,
-		);
+		const email = (data.email as string).trim().toLowerCase();
+
+		const existingEmail = await this.userRepository.findUserByEmail(email);
 
 		if (existingEmail) {
 			throw new Error("Email already exists");
@@ -47,9 +49,8 @@ export class UserService {
 
 		const user = await this.userRepository.createUser({
 			...data,
-
+			email,
 			password: hashedPassword,
-
 			is_verified: false,
 		});
 
@@ -61,6 +62,18 @@ export class UserService {
 
 		const loginLink = buildFirstLoginLink(firstLoginToken);
 
+		try {
+			await this.emailService.sendFirstLoginEmail({
+				to: user.email,
+				fullName: user.full_name,
+				loginLink,
+				role: user.role,
+			});
+		} catch (error) {
+			await this.userRepository.deleteUser(user._id.toString());
+			throw error;
+		}
+
 		const userResponse = await this.userRepository.findUserById(
 			user._id.toString(),
 		);
@@ -71,8 +84,7 @@ export class UserService {
 
 		return {
 			user: userResponse,
-			loginLink,
-			firstLoginToken,
+			emailSent: true,
 		};
 	}
 

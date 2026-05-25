@@ -1,4 +1,4 @@
-const DEFAULT_FRONTEND_URL = "http://localhost:5173";
+const DEFAULT_FRONTEND_URL = "http://localhost:3000";
 
 export const buildFirstLoginLink = (token: string): string => {
 	const baseUrl = (

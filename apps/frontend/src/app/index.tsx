@@ -17,6 +17,8 @@ import { Login } from './pages/Login/Loadable';
 import { Register } from './pages/Register/Loadable';
 import { useTranslation } from 'react-i18next';
 import { useGlobalSlice } from './slice';
+import { RedirectIfAuth } from './components/auth/RedirectIfAuth';
+import { RequireAuth } from './components/auth/RequireAuth';
 import Layout from './components/layout';
 import { Toaster } from './components/ui/toaster';
 
@@ -36,9 +38,17 @@ export function App() {
         </Helmet>
         <Routes>
           <Route element={<Layout />}>
-            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="*" element={<NotFound />} />
+          </Route>
+          <Route element={<RedirectIfAuth />}>
+            <Route element={<Layout />}>
+              <Route path="/login" element={<Login />} />
+            </Route>
+          </Route>
+          <Route element={<RequireAuth />}>
+            <Route element={<Layout />}>
+              <Route path="*" element={<NotFound />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

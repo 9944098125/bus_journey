@@ -33,15 +33,16 @@ export function LoginEmailField({
           placeholder="you@example.com"
           className={cn(INPUT_CLASS, 'pl-11', errors.email && 'border-red-400')}
           {...register('email', {
+            maxLength: {
+              value: 30,
+              message: 'Email cannot exceed 30 characters',
+            },
             validate: value => {
               if (!isActive) {
                 return true;
               }
               if (!value?.trim()) {
                 return 'Email is required';
-              }
-              if (value.length > 20) {
-                return 'Email cannot exceed 20 characters';
               }
               if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
                 return 'Enter a valid email address';

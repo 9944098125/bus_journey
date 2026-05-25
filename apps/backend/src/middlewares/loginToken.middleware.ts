@@ -53,7 +53,10 @@ export const validateFirstLoginToken = async (
 			return;
 		}
 
-		if (user.email !== payload.email || user.role !== payload.role) {
+		if (
+			user.email.toLowerCase() !== payload.email.toLowerCase() ||
+			user.role !== payload.role
+		) {
 			res.status(401).json({
 				success: false,
 				message: "Invalid or expired login link",

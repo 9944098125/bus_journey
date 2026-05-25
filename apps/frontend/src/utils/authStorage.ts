@@ -8,6 +8,11 @@ export type StoredAuth = {
   token: string | null;
 };
 
+export const hasStoredAuth = (): boolean => {
+  const { user, token } = loadAuthFromStorage();
+  return Boolean(user && token);
+};
+
 export const loadAuthFromStorage = (): StoredAuth => {
   const localUser = localStorage.getItem(USER_KEY);
   const localToken = localStorage.getItem(TOKEN_KEY);

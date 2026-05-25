@@ -20,6 +20,9 @@ export function LoginForm({
   setPhoneCountry,
   isBusy,
   onSubmit,
+  activationStatus,
+  showActivationForm,
+  isVerifyingLink,
 }: LoginFormProps) {
   const {
     register,
@@ -47,6 +50,26 @@ export function LoginForm({
       <div className="rounded-3xl border border-[#e8d4d6] bg-white/90 p-6 shadow-xl shadow-[#722f37]/10 backdrop-blur-sm sm:p-8 md:p-10 lg:flex lg:min-h-full lg:flex-1 lg:flex-col lg:justify-center lg:overflow-y-auto lg:rounded-none lg:border-0 lg:border-l lg:border-l-[#e8d4d6] lg:shadow-none lg:p-10 xl:p-14">
         <LoginFormHeader />
 
+        {isVerifyingLink && (
+          <p className="mb-6 rounded-xl border border-[#e8d4d6] bg-[#fdf8f8] px-4 py-3 text-sm text-[#722f37]">
+            Activating your account from the email link…
+          </p>
+        )}
+
+        {activationStatus === 'already_active' && (
+          <p className="mb-6 rounded-xl border border-[#e8d4d6] bg-[#fdf8f8] px-4 py-3 text-sm text-[#722f37]">
+            Your account is already active. Sign in with your password below.
+          </p>
+        )}
+
+        {activationStatus === 'failed' && (
+          <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            Activation link is invalid or expired. Register again or contact
+            support.
+          </p>
+        )}
+
+        {showActivationForm && (
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6"
@@ -83,6 +106,7 @@ export function LoginForm({
 
           <LoginSubmitSection isBusy={isBusy} />
         </form>
+        )}
       </div>
     </section>
   );

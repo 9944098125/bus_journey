@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     },
+    "types": ["node", "jest", "webpack-env"],
     "noImplicitAny": false,
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

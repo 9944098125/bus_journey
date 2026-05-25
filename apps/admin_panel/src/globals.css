@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+:root {
+  --sea-deep: #023047;
+  --sea-mid: #0077b6;
+  --sea-bright: #00b4d8;
+  --sea-light: #90e0ef;
+  --sea-pale: #caf0f8;
+  --sea-surface: #e8f6fc;
+  --sea-foam: #f0f9ff;
+  --sea-accent: #48cae4;
+  --sea-glow: #ade8f4;
+
+  --background: 199 89% 96%;
+  --foreground: 201 100% 14%;
+  --primary: 199 100% 36%;
+  --primary-foreground: 0 0% 100%;
+  --border: 199 52% 82%;
+  --input: 199 52% 82%;
+  --ring: 199 100% 36%;
+
+  --sidebar-width-collapsed: 4.5rem;
+  --sidebar-expanded: 280px;
+
+  --sidebar-bg: #0a1628;
+  --sidebar-bg-end: #0f2847;
+  --sidebar-accent: rgba(0, 180, 216, 0.35);
+}
+
+.dark {
+  --background: 201 40% 8%;
+  --foreground: 199 89% 96%;
+  --sea-surface: #0b1525;
+  --sea-foam: #0a1220;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 1.4rem;
+  background-color: var(--sea-surface);
+}
+
+.register-phone-input.react-tel-input .form-control {
+  width: 100% !important;
+  height: 5rem !important;
+}
+
+.register-phone-input.react-tel-input .form-control::placeholder {
+  color: #7eb8d4;
+  opacity: 1;
+}
+
+.register-phone-input.react-tel-input .flag-dropdown,
+.register-phone-input.react-tel-input .selected-flag {
+  height: 5rem !important;
+}
+
+.register-phone-input.react-tel-input .flag-dropdown.open,
+.register-phone-input.react-tel-input .flag-dropdown.open .selected-flag {
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.register-phone-input.react-tel-input .country-list {
+  border-radius: 0.75rem;
+  margin-top: 4px;
+  max-height: 220px;
+}
+
+.register-phone-input.react-tel-input .country-list .country:hover,
+.register-phone-input.react-tel-input .country-list .country.highlight {
+  background-color: var(--sea-pale);
+}
+
+#LIST_SCROLLBAR::-webkit-scrollbar {
+  width: 5px;
+}
+
+#LIST_SCROLLBAR::-webkit-scrollbar-track {
+  background: var(--sea-pale);
+}
+
+#LIST_SCROLLBAR::-webkit-scrollbar-thumb {
+  background-color: var(--sea-mid);
+  border-radius: 20px;
+  border: 1px solid var(--sea-deep);
+}
+
+.admin-wave-bg {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(0, 180, 216, 0.14), transparent 42%),
+    radial-gradient(circle at 88% 72%, rgba(72, 202, 228, 0.12), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(2, 48, 71, 0.04), transparent 55%),
+    linear-gradient(160deg, var(--sea-foam) 0%, var(--sea-surface) 45%, var(--sea-pale) 100%);
+}
+
+.admin-sidebar-gradient {
+  background: linear-gradient(
+    175deg,
+    var(--sea-deep) 0%,
+    var(--sea-mid) 42%,
+    #0096c7 78%,
+    var(--sea-bright) 100%
+  );
+}
+
+.premium-sidebar {
+  background: linear-gradient(
+    168deg,
+    var(--sidebar-bg) 0%,
+    #0d1f38 38%,
+    var(--sidebar-bg-end) 72%,
+    #0a1e36 100%
+  );
+}
+
+.dark .premium-sidebar {
+  background: linear-gradient(
+    168deg,
+    #060d18 0%,
+    #0a1528 45%,
+    #0c1a30 100%
+  );
+}
+
+.premium-sidebar-glow {
+  background:
+    radial-gradient(ellipse 120% 80% at 0% 0%, rgba(0, 180, 216, 0.22), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(72, 202, 228, 0.12), transparent 45%);
+}
+
+.premium-sidebar-mesh {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(180deg, black 0%, transparent 85%);
+  opacity: 0.5;
+}
+
+.admin-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(144, 224, 239, 0.35) transparent;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(144, 224, 239, 0.28);
+  border-radius: 999px;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(144, 224, 239, 0.45);
+}
+
+.dark .admin-wave-bg {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(0, 119, 182, 0.12), transparent 42%),
+    radial-gradient(circle at 88% 72%, rgba(2, 48, 71, 0.35), transparent 38%),
+    linear-gradient(160deg, #0a1220 0%, #0b1525 45%, #0d1a2e 100%);
+}
+
+.admin-card-surface {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(232, 246, 252, 0.88) 100%
+  );
+  border-color: rgba(144, 224, 239, 0.65);
+  box-shadow:
+    0 4px 24px -6px rgba(0, 119, 182, 0.12),
+    0 0 0 1px rgba(144, 224, 239, 0.35);
+}

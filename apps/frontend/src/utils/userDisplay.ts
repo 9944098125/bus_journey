@@ -22,6 +22,16 @@ export const getUserDisplayName = (user: UserLike): string => {
   return 'Traveler';
 };
 
+export const getUserEmail = (user: UserLike): string => {
+  const email = user?.email;
+
+  if (typeof email === 'string' && email.trim()) {
+    return email.trim();
+  }
+
+  return 'guest@busjourney.app';
+};
+
 export const getUserInitials = (user: UserLike): string => {
   const parts = getUserDisplayName(user).split(/\s+/).filter(Boolean);
 

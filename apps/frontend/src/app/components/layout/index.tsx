@@ -1,24 +1,39 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Outlet, useLocation } from 'react-router-dom';
+
 import { useGlobalSlice } from 'app/slice';
+import { SidebarProvider } from 'app/components/layout/sidebar-context';
+import { Sidebar } from 'app/components/layout/sidebar';
+
 import Navbar from './components/navbar';
-import { Outlet } from 'react-router-dom';
-import Sidebar from './components/sidebar';
 
 const Layout = () => {
   useGlobalSlice();
+  const { pathname } = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fdf5f5] via-[#faf0f0] to-[#f3e4e6]">
-      <Navbar />
+    <SidebarProvider>
+      <div className="travel-app-bg min-h-screen">
+        <Navbar />
 
-      <div className="flex pt-[70px]">
-        <Sidebar />
+        <div className="flex pt-[70px]">
+          <Sidebar />
 
-        <main className="min-h-[calc(100vh-70px)] min-w-0 flex-1 bg-[#fffbfa]/50 p-3 shadow-[inset_8px_0_32px_-24px_rgba(114,47,55,0.1)] backdrop-blur-[2px] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sm:p-4 md:p-6 lg:p-8">
-          <Outlet />
-        </main>
+          <motion.main
+            key={pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="min-h-[calc(100vh-70px)] min-w-0 flex-1 p-3 sm:p-4 md:p-6 lg:p-8"
+          >
+            <div className="travel-main-surface min-h-full rounded-2xl p-4 sm:p-6 md:p-8">
+              <Outlet />
+            </div>
+          </motion.main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

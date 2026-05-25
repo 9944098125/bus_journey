@@ -1,15 +1,22 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { Menu } from 'lucide-react';
+import { motion } from 'framer-motion';
 
+import { useSidebar } from 'app/components/layout/sidebar-context';
 import { selectUser } from 'app/slice/selectors';
 import { cn } from 'utils/twm';
+import { useMediaQuery } from 'utils/hooks/use-media-query';
+import { SIDEBAR_DESKTOP_BREAKPOINT } from 'app/components/layout/sidebar/sidebar.constants';
 
 import UserAvatar from './user-avatar';
 
 const Navbar = () => {
   const user = useSelector(selectUser);
   const { pathname } = useLocation();
+  const { toggleMobile } = useSidebar();
+  const isLargeScreen = useMediaQuery(SIDEBAR_DESKTOP_BREAKPOINT);
   const isAuthPage = pathname === '/login' || pathname === '/register';
 
   return (
@@ -20,6 +27,24 @@ const Navbar = () => {
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/40 to-transparent" />
 
       <div className="relative flex h-full items-center justify-between gap-4 px-4 py-2 backdrop-blur-sm md:px-8">
+        <div className="flex min-w-0 items-center gap-3">
+          {!isLargeScreen && !isAuthPage && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.96 }}
+              onClick={toggleMobile}
+              className={cn(
+                'flex size-11 shrink-0 items-center justify-center rounded-2xl lg:hidden',
+                'border border-rose-100/30 bg-white/10 text-rose-50 backdrop-blur-md',
+                'hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/70',
+              )}
+              aria-label="Open navigation menu"
+              aria-controls="travel-sidebar-nav"
+            >
+              <Menu size={22} strokeWidth={2.25} aria-hidden />
+            </motion.button>
+          )}
+
         <div className="group flex min-w-0 cursor-default items-center gap-4 rounded-2xl transition-transform duration-300 hover:scale-[1.02]">
           <div className="relative shrink-0">
             <div className="absolute inset-0 rounded-2xl bg-amber-400/35 blur-xl transition-all duration-500 group-hover:bg-amber-300/45 group-hover:blur-2xl" />
@@ -40,6 +65,7 @@ const Navbar = () => {
               Smart Travel Platform
             </p>
           </div>
+        </div>
         </div>
 
         {(user || !isAuthPage) && (

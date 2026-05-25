@@ -1,6 +1,8 @@
 import { RootState } from 'types';
-import { Saga } from 'redux-saga';
 import { SagaInjectionModes } from 'redux-injectors';
+
+/** Matches redux-saga generator functions used with redux-injectors */
+export type Saga = (...args: unknown[]) => Generator<unknown, void, unknown>;
 import { Reducer, AnyAction } from '@reduxjs/toolkit';
 
 type RequiredRootState = Required<RootState>;

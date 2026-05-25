@@ -1,6 +1,7 @@
 import "dotenv/config";
 import app from "./app.js";
 import { connectDatabase } from "./config/database.js";
+import { getMailTransporter } from "./config/mailer.js";
 const FALLBACK_PORTS = [5001, 5005];
 const portsToTry = [
     ...new Set([Number(process.env.PORT), ...FALLBACK_PORTS].filter((port) => Number.isFinite(port) && port > 0)),
@@ -20,6 +21,13 @@ const listenOnPort = (port) => new Promise((resolve, reject) => {
 const startServer = async () => {
     try {
         await connectDatabase();
+        try {
+            await getMailTransporter().verify();
+            console.log("✉️  SMTP ready — activation emails will be sent on register");
+        }
+        catch (emailError) {
+            console.warn("⚠️  SMTP not ready — registration emails will fail until .env is fixed:", emailError instanceof Error ? emailError.message : emailError);
+        }
         let server;
         let activePort;
         for (const port of portsToTry) {

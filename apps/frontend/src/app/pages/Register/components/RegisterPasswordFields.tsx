@@ -47,8 +47,8 @@ export function RegisterPasswordFields({
             {...register('password', {
               required: 'Password is required',
               maxLength: {
-                value: 12,
-                message: 'Password cannot exceed 12 characters',
+                value: 25,
+                message: 'Password cannot exceed 25 characters',
               },
               minLength: {
                 value: 6,
