@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+
+# Environment (keep example for reference)
+.env
+.env.*
+!.env.example
+
+# Test coverage
+coverage/
+
+# Turbo
+.turbo/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local uploads / temp files
+uploads/
+tmp/
+temp/
+
+# OS & editor
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Tooling caches
+.eslintcache

@@ -15,6 +15,19 @@ module.exports = {
     },
     extend: {
       colors: {
+        plum: {
+          50: '#FDF8FB',
+          100: '#F5E8F0',
+          200: '#E8C4D6',
+          300: '#D4899E',
+          400: '#B83A82',
+          500: '#9A2470',
+          600: '#5F0F40',
+          700: '#4D0B33',
+          800: '#3D0A2B',
+          900: '#2D0720',
+          950: '#1F0516',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

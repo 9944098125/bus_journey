@@ -26,13 +26,6 @@ export type SidebarNavGroup = {
   items: SidebarNavItem[];
 };
 
-export type SidebarBranding = {
-  title: string;
-  subtitle: string;
-  logoSrc: string;
-  logoAlt?: string;
-};
-
 export type SidebarProfile = {
   name: string;
   email: string;

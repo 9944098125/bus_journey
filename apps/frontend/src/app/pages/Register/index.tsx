@@ -2,9 +2,9 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import 'react-phone-input-2/lib/style.css';
 
-import { RegisterForm } from './components/RegisterForm';
-import { RegisterHero } from './components/RegisterHero';
-import { useRegisterForm } from './hooks/useRegisterForm';
+import { RegisterForm } from './components/register-form';
+import { RegisterHero } from './components/register-hero';
+import { useRegisterForm } from './hooks/use-register-form';
 import { useRegisterSlice } from './slice';
 
 export function Register() {

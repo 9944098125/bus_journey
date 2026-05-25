@@ -89,7 +89,7 @@ export const componentGenerator: PlopGeneratorConfig = {
     if (answers.wantLoadable) {
       actions.push({
         type: 'add',
-        path: `${componentPath}/Loadable.ts`,
+        path: `${componentPath}/loadable.ts`,
         templateFile: './component/loadable.ts.hbs',
         abortOnFail: true,
       });

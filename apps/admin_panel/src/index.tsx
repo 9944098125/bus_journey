@@ -21,9 +21,9 @@ import { App } from 'app';
 
 import { HelmetProvider } from 'react-helmet-async';
 
-import { configureAppStore } from 'store/configureStore';
+import { configureAppStore } from 'store/configure-store';
 
-import reportWebVitals from 'reportWebVitals';
+import reportWebVitals from 'report-web-vitals';
 
 // Initialize languages
 import './locales/i18n';

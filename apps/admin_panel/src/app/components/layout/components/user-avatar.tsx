@@ -7,7 +7,7 @@ import {
   getUserDisplayName,
   getUserInitials,
   getUserProfilePicture,
-} from 'utils/userDisplay';
+} from 'utils/user-display';
 
 export default function UserAvatar() {
   const user = useSelector(selectUser);
@@ -23,14 +23,14 @@ export default function UserAvatar() {
   return (
     <div
       className={cn(
-        'flex min-w-0 items-center gap-3 rounded-2xl border-2 border-[#90e0ef]/50 bg-white/10 px-2 py-1.5',
+        'flex min-w-0 items-center gap-3 rounded-2xl border-2 border-[#90e0ef]/50 bg-white/10 px-2.5 py-2',
         'shadow-lg shadow-[#023047]/25 backdrop-blur-sm',
       )}
       aria-label={`Logged in as ${displayName}`}
     >
       <div
         className={cn(
-          'relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl',
+          'relative flex size-18 shrink-0 items-center justify-center overflow-hidden rounded-2xl',
           'border-2 border-[#90e0ef]/40 bg-[#e8f6fc] shadow-inner',
         )}
       >
@@ -41,7 +41,7 @@ export default function UserAvatar() {
             className="size-full object-cover"
           />
         ) : (
-          <span className="text-xl font-bold tracking-tight text-[#0077b6]">
+          <span className="text-2xl font-bold tracking-tight text-[#0077b6]">
             {initials}
           </span>
         )}

@@ -11,15 +11,14 @@ import {
   getUserDisplayName,
   getUserInitials,
   getUserProfilePicture,
-} from 'utils/userDisplay';
+} from 'utils/user-display';
 import { cn } from 'utils/twm';
 
-import SidebarBrand from './SidebarBrand';
-import SidebarGroup from './SidebarGroup';
-import SidebarProfile from './SidebarProfile';
-import SidebarSearch from './SidebarSearch';
-import SidebarSkeleton from './SidebarSkeleton';
-import SidebarToggle from './SidebarToggle';
+import SidebarGroup from './sidebar-group';
+import SidebarProfile from './sidebar-profile';
+import SidebarSearch from './sidebar-search';
+import SidebarSkeleton from './sidebar-skeleton';
+import SidebarToggle from './sidebar-toggle';
 import {
   SIDEBAR_COLLAPSED_WIDTH,
   SIDEBAR_EXPANDED_WIDTH,
@@ -65,8 +64,6 @@ function SidebarPanel({
 
   return (
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      <SidebarBrand collapsed={collapsed} isLoading={isLoading} />
-
       <SidebarSearch
         collapsed={collapsed}
         value={searchQuery}
@@ -77,7 +74,7 @@ function SidebarPanel({
       <nav
         id="admin-sidebar-nav"
         className={cn(
-          'admin-sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden',
+          'admin-sidebar-scroll flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-hidden',
           collapsed ? 'px-2' : 'px-2',
         )}
         aria-label="Main navigation"

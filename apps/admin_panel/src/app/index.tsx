@@ -10,13 +10,13 @@ import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { NotFound } from './pages/NotFound/Loadable';
-import { Login } from './pages/Login/Loadable';
-import { Dashboard } from './pages/Dashboard/Loadable';
+import { NotFound } from './pages/NotFound/loadable';
+import { Login } from './pages/Login/loadable';
+import { Dashboard } from './pages/Dashboard/loadable';
 import { useTranslation } from 'react-i18next';
 import { useGlobalSlice } from './slice';
-import { RedirectIfAuth } from './components/auth/RedirectIfAuth';
-import { RequireAuth } from './components/auth/RequireAuth';
+import { RedirectIfAuth } from './components/auth/redirect-if-auth';
+import { RequireAuth } from './components/auth/require-auth';
 import Layout from './components/layout';
 import { Toaster } from './components/ui/toaster';
 

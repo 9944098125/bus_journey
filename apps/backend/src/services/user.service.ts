@@ -13,7 +13,7 @@ import type {
 import { UserRepository } from "../repositories/user.repository.js";
 import { EmailService } from "./email.service.js";
 
-import { buildFirstLoginLink } from "../utils/loginLink.js";
+import { buildFirstLoginLink } from "../utils/login-link.js";
 import { signFirstLoginToken, signToken } from "../utils/jwt.js";
 
 export class UserService {

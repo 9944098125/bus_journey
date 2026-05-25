@@ -12,16 +12,15 @@ import {
   getUserEmail,
   getUserInitials,
   getUserProfilePicture,
-} from 'utils/userDisplay';
+} from 'utils/user-display';
 import { cn } from 'utils/twm';
 
-import SidebarBrand from './SidebarBrand';
-import SidebarGroup from './SidebarGroup';
-import SidebarProfile from './SidebarProfile';
-import SidebarRecent from './SidebarRecent';
-import SidebarSearch from './SidebarSearch';
-import SidebarSkeleton from './SidebarSkeleton';
-import SidebarToggle from './SidebarToggle';
+import SidebarGroup from './sidebar-group';
+import SidebarProfile from './sidebar-profile';
+import SidebarRecent from './sidebar-recent';
+import SidebarSearch from './sidebar-search';
+import SidebarSkeleton from './sidebar-skeleton';
+import SidebarToggle from './sidebar-toggle';
 import {
   SIDEBAR_COLLAPSED_WIDTH,
   SIDEBAR_DESKTOP_BREAKPOINT,
@@ -57,7 +56,7 @@ function SidebarPanel({
 }: SidebarPanelProps) {
   const user = useSelector(selectUser);
   const filteredGroups = useSidebarFilter(searchQuery, { isAuthenticated });
-  const { recent } = useRecentRoutes();
+  const { recent, clearRecent } = useRecentRoutes();
 
   const profile: SidebarProfileType = useMemo(
     () => ({
@@ -72,9 +71,7 @@ function SidebarPanel({
   );
 
   return (
-    <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      <SidebarBrand collapsed={collapsed} isLoading={isLoading} />
-
+    <div className={cn('relative z-[1] flex h-full min-h-0 flex-col', className)}>
       <SidebarSearch
         collapsed={collapsed}
         value={searchQuery}
@@ -85,7 +82,7 @@ function SidebarPanel({
       <nav
         id={SIDEBAR_NAV_ID}
         className={cn(
-          'travel-sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden',
+          'travel-sidebar-scroll flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-hidden',
           collapsed ? 'px-2' : 'px-2',
         )}
         aria-label="Main navigation"
@@ -95,7 +92,7 @@ function SidebarPanel({
         ) : filteredGroups.length === 0 ? (
           <p
             className={cn(
-              'px-3 py-6 text-center text-[12px] text-white/40',
+              'px-3 py-6 text-center text-[12px] text-plum-600/55',
               collapsed && 'px-1 text-[10px]',
             )}
           >
@@ -117,12 +114,13 @@ function SidebarPanel({
           <SidebarRecent
             collapsed={collapsed}
             recent={recent}
+            onClearRecent={clearRecent}
             onNavigate={onNavigate}
           />
         )}
       </nav>
 
-      <SidebarToggle collapsed={collapsed} />
+      {!onNavigate && <SidebarToggle collapsed={collapsed} />}
 
       <SidebarProfile
         profile={profile}
@@ -138,30 +136,35 @@ function SidebarSurface({
   children,
   collapsed,
   className,
+  fullWidth = false,
 }: {
   children: React.ReactNode;
   collapsed: boolean;
   className?: string;
+  fullWidth?: boolean;
 }) {
   return (
     <aside
       className={cn(
-        'travel-sidebar relative flex shrink-0 flex-col overflow-hidden',
-        'border-r border-white/10 shadow-[4px_0_48px_-16px_rgba(15,76,110,0.45)]',
-        'transition-[width] duration-300 ease-out',
+        'travel-sidebar journey-sidebar-shell relative flex shrink-0 flex-col overflow-hidden',
+        'transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+        fullWidth && 'w-full',
         className,
       )}
-      style={{
-        width: collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
-      }}
+      style={
+        fullWidth
+          ? undefined
+          : {
+              width: collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
+            }
+      }
       aria-label="Travel navigation"
     >
-      <div className="travel-sidebar-glow pointer-events-none absolute inset-0" aria-hidden />
-      <div className="travel-sidebar-mesh pointer-events-none absolute inset-0" aria-hidden />
-      <div className="travel-sidebar-shine pointer-events-none absolute inset-0" aria-hidden />
-      <div className="relative z-[1] flex h-full min-h-0 flex-col">
-        {children}
-      </div>
+      <span className="journey-sidebar-orb journey-sidebar-orb--primary" aria-hidden />
+      <span className="journey-sidebar-orb journey-sidebar-orb--accent" aria-hidden />
+      <span className="journey-sidebar-rail" aria-hidden />
+      <span className="journey-sidebar-edge" aria-hidden />
+      <div className="relative z-[1] flex h-full min-h-0 flex-col">{children}</div>
     </aside>
   );
 }
@@ -229,7 +232,7 @@ export default function Sidebar() {
     <motion.div
       initial={false}
       animate={{ opacity: 1 }}
-      className="sticky top-[70px] z-40 hidden h-[calc(100vh-70px)] lg:flex"
+      className="sticky top-[70px] z-40 hidden h-[calc(100vh-70px)] lg:flex lg:pl-1"
     >
       <SidebarSurface collapsed={collapsed && isLargeScreen}>
         <SidebarPanel {...panelProps} />
@@ -242,21 +245,24 @@ export default function Sidebar() {
       <SheetContent
         side="left"
         className={cn(
-          'travel-sidebar w-[min(100vw,288px)] max-w-[288px] border-0 p-0',
+          'journey-sidebar-mobile-sheet travel-sidebar',
+          'h-full w-[min(100vw,300px)] max-w-[300px] border-0 p-0 sm:max-w-[300px]',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left',
         )}
       >
-        <div className="travel-sidebar-glow pointer-events-none absolute inset-0" aria-hidden />
-        <div className="travel-sidebar-mesh pointer-events-none absolute inset-0" aria-hidden />
-        <div className="travel-sidebar-shine pointer-events-none absolute inset-0" aria-hidden />
-        <div className="relative z-[1] flex h-full flex-col pt-3">
+        <span className="journey-sidebar-orb journey-sidebar-orb--primary" aria-hidden />
+        <span className="journey-sidebar-orb journey-sidebar-orb--accent" aria-hidden />
+        <span className="journey-sidebar-rail" aria-hidden />
+        <SidebarSurface collapsed={false} fullWidth className="h-full border-0 shadow-none">
           <SidebarPanel
             {...panelProps}
             collapsed={false}
             animatedActive={false}
             onNavigate={closeMobile}
+            className="pt-3"
           />
-        </div>
+        </SidebarSurface>
       </SheetContent>
     </Sheet>
   );

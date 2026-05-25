@@ -21,7 +21,7 @@ type Answers = { [P in SliceProptNames]: string };
 
 export const rootStatePath = path.join(
   __dirname,
-  '../../../src/types/RootState.ts',
+  '../../../src/types/root-state.ts',
 );
 
 export const sliceGenerator: PlopGeneratorConfig = {

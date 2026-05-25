@@ -26,15 +26,12 @@ import {
 
 import type { SidebarNavGroup } from './sidebar.types';
 
-export const SIDEBAR_BRAND = {
-  title: 'BusJourney',
-  subtitle: 'Admin Console',
-  logoSrc: '/images/logo.svg',
-  logoAlt: 'Bus Journey logo',
-} as const;
-
 export const SIDEBAR_EXPANDED_WIDTH = 280;
 export const SIDEBAR_COLLAPSED_WIDTH = 72;
+
+/** Centered nav column — items share width so icons align vertically */
+export const SIDEBAR_NAV_COLUMN =
+  'mx-auto w-full max-w-[220px] min-w-0';
 
 export const sidebarNavGroups: SidebarNavGroup[] = [
   {

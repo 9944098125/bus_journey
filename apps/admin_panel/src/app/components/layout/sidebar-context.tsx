@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 
 const SIDEBAR_OPEN_KEY = 'admin-panel-sidebar-open';
-const SIDEBAR_DARK_KEY = 'admin-panel-sidebar-dark';
 
 type SidebarContextValue = {
   isOpen: boolean;
@@ -17,9 +16,6 @@ type SidebarContextValue = {
   isMobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
   toggleMobile: () => void;
-  isDark: boolean;
-  setIsDark: (dark: boolean) => void;
-  toggleDark: () => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
 };
@@ -36,14 +32,9 @@ function readStored(key: string, fallback: boolean): boolean {
   }
 }
 
-function applyDarkClass(isDark: boolean) {
-  document.documentElement.classList.toggle('dark', isDark);
-}
-
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpenState] = useState(() => readStored(SIDEBAR_OPEN_KEY, true));
   const [isMobileOpen, setMobileOpenState] = useState(false);
-  const [isDark, setIsDarkState] = useState(() => readStored(SIDEBAR_DARK_KEY, false));
   const [isLoading, setIsLoadingState] = useState(true);
 
   useEffect(() => {
@@ -55,13 +46,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   }, [isOpen]);
 
   useEffect(() => {
-    applyDarkClass(isDark);
-    try {
-      localStorage.setItem(SIDEBAR_DARK_KEY, String(isDark));
-    } catch {
-      // ignore
-    }
-  }, [isDark]);
+    document.documentElement.classList.remove('dark');
+  }, []);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsLoadingState(false), 480);
@@ -84,14 +70,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     setMobileOpenState(prev => !prev);
   }, []);
 
-  const setIsDark = useCallback((dark: boolean) => {
-    setIsDarkState(dark);
-  }, []);
-
-  const toggleDark = useCallback(() => {
-    setIsDarkState(prev => !prev);
-  }, []);
-
   const setIsLoading = useCallback((loading: boolean) => {
     setIsLoadingState(loading);
   }, []);
@@ -104,9 +82,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
       isMobileOpen,
       setMobileOpen,
       toggleMobile,
-      isDark,
-      setIsDark,
-      toggleDark,
       isLoading,
       setIsLoading,
     }),
@@ -117,9 +92,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
       isMobileOpen,
       setMobileOpen,
       toggleMobile,
-      isDark,
-      setIsDark,
-      toggleDark,
       isLoading,
       setIsLoading,
     ],

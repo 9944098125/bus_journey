@@ -9,7 +9,7 @@ import {
   clearAuthStorage,
   loadAuthFromStorage,
   persistAuthToStorage,
-} from 'utils/authStorage';
+} from 'utils/auth-storage';
 
 const storedAuth = loadAuthFromStorage();
 

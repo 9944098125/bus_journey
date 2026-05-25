@@ -12,14 +12,16 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // import { GlobalStyle } from 'styles/global-styles';
 
-import { NotFound } from './pages/NotFound/Loadable';
-import { Login } from './pages/Login/Loadable';
-import { Register } from './pages/Register/Loadable';
+import { NotFound } from './pages/NotFound/loadable';
+import { Home } from './pages/Home/loadable';
+import { Login } from './pages/Login/loadable';
+import { Register } from './pages/Register/loadable';
 import { useTranslation } from 'react-i18next';
 import { useGlobalSlice } from './slice';
-import { RedirectIfAuth } from './components/auth/RedirectIfAuth';
-import { RequireAuth } from './components/auth/RequireAuth';
+import { RedirectIfAuth } from './components/auth/redirect-if-auth';
+import { RequireAuth } from './components/auth/require-auth';
 import Layout from './components/layout';
+import { sidebarProtectedHrefs } from './components/layout/sidebar/sidebar-routes';
 import { Toaster } from './components/ui/toaster';
 
 export function App() {
@@ -45,10 +47,14 @@ export function App() {
               <Route path="/login" element={<Login />} />
             </Route>
           </Route>
-          <Route element={<RequireAuth />}>
-            <Route element={<Layout />}>
-              <Route path="*" element={<NotFound />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route element={<RequireAuth />}>
+              {sidebarProtectedHrefs.map(href => (
+                <Route key={href} path={href} element={<NotFound />} />
+              ))}
             </Route>
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </BrowserRouter>

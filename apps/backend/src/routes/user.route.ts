@@ -5,7 +5,7 @@ import { UserController } from "../controllers/user.controller.js";
 import {
 	requireVerifiedForPasswordLogin,
 	validateFirstLoginToken,
-} from "../middlewares/loginToken.middleware.js";
+} from "../middlewares/login-token.middleware.js";
 import { upload } from "../middlewares/upload.middleware.js";
 
 const router = Router();
