@@ -62,6 +62,14 @@ export class UserRepository {
 		return Users.findById(id).select("-password");
 	}
 
+	public async markUserAsVerified(id: string) {
+		return Users.findByIdAndUpdate(
+			id,
+			{ is_verified: true },
+			{ new: true, runValidators: true },
+		).select("-password");
+	}
+
 	/**
 	 * Update user
 	 */
@@ -95,5 +103,36 @@ export class UserRepository {
 		console.log("[DEBUG] UserRepository.getAllUsers — done, count:", users.length);
 
 		return users;
+	}
+
+	/**
+	 * Delete all users and admins; returns the deleted users' names and roles.
+	 */
+
+	public async deleteAllUsers() {
+		const users = await Users.find()
+			.select("full_name role")
+			.sort({ createdAt: -1 });
+
+		if (users.length === 0) {
+			return {
+				deletedCount: 0,
+				names: [] as string[],
+				deletedUsers: [] as { full_name: string; role: "USER" | "ADMIN" }[],
+			};
+		}
+
+		await Users.deleteMany({});
+
+		const deletedUsers = users.map((user) => ({
+			full_name: user.full_name,
+			role: user.role,
+		}));
+
+		return {
+			deletedCount: deletedUsers.length,
+			names: deletedUsers.map((user) => user.full_name),
+			deletedUsers,
+		};
 	}
 }

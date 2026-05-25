@@ -2,6 +2,10 @@ import { Router } from "express";
 
 import { UserController } from "../controllers/user.controller.js";
 
+import {
+	requireVerifiedForPasswordLogin,
+	validateFirstLoginToken,
+} from "../middlewares/loginToken.middleware.js";
 import { upload } from "../middlewares/upload.middleware.js";
 
 const router = Router();
@@ -19,10 +23,39 @@ router.post(
 );
 
 /**
- * Login user
+ * First login via magic link (query: ?token=... or body: { token })
  */
 
-router.post("/login", userController.loginUser.bind(userController));
+router.get(
+	"/login/verify",
+	validateFirstLoginToken,
+	userController.verifyFirstLogin.bind(userController),
+);
+
+router.post(
+	"/login/verify",
+	validateFirstLoginToken,
+	userController.verifyFirstLogin.bind(userController),
+);
+
+/**
+ * Login user (password login only after first-login link activation)
+ */
+
+router.post(
+	"/login",
+	requireVerifiedForPasswordLogin,
+	userController.loginUser.bind(userController),
+);
+
+/**
+ * Delete all users and admins
+ */
+
+router.delete(
+	"/all",
+	userController.deleteAllUsers.bind(userController),
+);
 
 /*
  * Get All Users

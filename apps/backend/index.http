@@ -1,3 +1,32 @@
 ##### GET ALL USERS
 GET http://127.0.0.1:5001/api/users
 Content-Type: application/json
+
+##### DELETE ALL USERS AND ADMINS
+DELETE http://127.0.0.1:5001/api/users/all
+Content-Type: application/json
+
+##### REGISTER ADMIN
+POST http://127.0.0.1:5001/api/users/register
+Content-Type: application/json
+
+{
+  "full_name": "Satyanarayana Akella",
+  "email": "akella.satyanarayana2@gmail.com",
+  "country_code": "+91",
+  "phone_number": "8985723593",
+  "password": "Satyanarayana@13",
+  "role": "ADMIN"
+}
+
+##### FIRST LOGIN (paste token from register response loginLink query param)
+GET http://127.0.0.1:5001/api/users/login/verify?token=PASTE_TOKEN_HERE
+
+##### PASSWORD LOGIN (only works after first-login verify)
+POST http://127.0.0.1:5001/api/users/login
+Content-Type: application/json
+
+{
+  "email": "srinivas72075@gmail.com",
+  "password": "SrinivasAkella@14"
+}

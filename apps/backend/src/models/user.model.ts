@@ -17,7 +17,7 @@ const usersSchema = new Schema<IUser>(
 		email: {
 			type: String,
 			unique: true,
-			maxLength: 20,
+			maxLength: 30,
 			required: true,
 		},
 		country_code: {

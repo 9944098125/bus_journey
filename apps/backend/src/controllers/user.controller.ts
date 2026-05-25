@@ -15,14 +15,17 @@ export class UserController {
 		next: NextFunction,
 	): Promise<void> {
 		try {
-			const user = await this.userService.registerUser(req.body);
+			const { user, loginLink } = await this.userService.registerUser(req.body);
 
 			res.status(201).json({
 				success: true,
 
-				message: "User registered successfully",
+				message:
+					"User registered successfully. Use the login link to activate your account.",
 
 				data: user,
+
+				loginLink,
 			});
 		} catch (error) {
 			next(error);
@@ -55,7 +58,9 @@ export class UserController {
 				error instanceof Error &&
 				(error.message === "Invalid credentials" ||
 					error.message === "Password is required" ||
-					error.message === "Email or phone number is required")
+					error.message === "Email or phone number is required" ||
+					error.message ===
+						"Account not activated. Use your registration login link first.")
 			) {
 				res.status(401).json({
 					success: false,
@@ -66,6 +71,42 @@ export class UserController {
 				return;
 			}
 
+			next(error);
+		}
+	}
+
+	/**
+	 * Activate account and sign in using the first-login magic link token.
+	 */
+
+	public async verifyFirstLogin(
+		req: Request,
+		res: Response,
+		next: NextFunction,
+	): Promise<void> {
+		try {
+			const user = req.firstLoginUser;
+
+			if (!user) {
+				res.status(400).json({
+					success: false,
+					message: "Login link validation failed",
+				});
+
+				return;
+			}
+
+			const result = await this.userService.verifyFirstLogin(
+				user._id.toString(),
+			);
+
+			res.status(200).json({
+				success: true,
+				message: "Account activated successfully",
+				token: result.token,
+				data: result.user,
+			});
+		} catch (error) {
 			next(error);
 		}
 	}
@@ -181,6 +222,34 @@ export class UserController {
 
 					publicId: uploadedImage.public_id,
 				},
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/**
+	 * Delete all users and admins
+	 */
+
+	public async deleteAllUsers(
+		_req: Request,
+		res: Response,
+		next: NextFunction,
+	): Promise<void> {
+		try {
+			const { deletedCount, names, deletedUsers } =
+				await this.userService.deleteAllUsers();
+
+			res.status(200).json({
+				success: true,
+				message:
+					deletedCount === 0
+						? "No users to delete"
+						: "All users and admins deleted successfully",
+				count: deletedCount,
+				names,
+				deletedUsers,
 			});
 		} catch (error) {
 			next(error);

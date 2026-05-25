@@ -2,7 +2,8 @@ import bcrypt from "bcrypt";
 import streamifier from "streamifier";
 import cloudinary from "../config/cloudinary.js";
 import { UserRepository } from "../repositories/user.repository.js";
-import { signToken } from "../utils/jwt.js";
+import { buildFirstLoginLink } from "../utils/loginLink.js";
+import { signFirstLoginToken, signToken } from "../utils/jwt.js";
 export class UserService {
     userRepository = new UserRepository();
     /**
@@ -21,10 +22,44 @@ export class UserService {
          * Hash password
          */
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        return this.userRepository.createUser({
+        const user = await this.userRepository.createUser({
             ...data,
             password: hashedPassword,
+            is_verified: false,
         });
+        const firstLoginToken = signFirstLoginToken({
+            userId: user._id.toString(),
+            email: user.email,
+            role: user.role,
+        });
+        const loginLink = buildFirstLoginLink(firstLoginToken);
+        const userResponse = await this.userRepository.findUserById(user._id.toString());
+        if (!userResponse) {
+            throw new Error("User not found");
+        }
+        return {
+            user: userResponse,
+            loginLink,
+            firstLoginToken,
+        };
+    }
+    /**
+     * Complete first login using the magic link token (marks user as verified).
+     */
+    async verifyFirstLogin(userId) {
+        const user = await this.userRepository.markUserAsVerified(userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const token = signToken({
+            userId: user._id.toString(),
+            email: user.email,
+            role: user.role,
+        });
+        return {
+            user,
+            token,
+        };
     }
     /**
      * Login user with email or phone number and password
@@ -47,6 +82,9 @@ export class UserService {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new Error("Invalid credentials");
+        }
+        if (!user.is_verified) {
+            throw new Error("Account not activated. Use your registration login link first.");
         }
         const token = signToken({
             userId: user._id.toString(),
@@ -120,5 +158,11 @@ export class UserService {
      */
     async getAllUsers() {
         return this.userRepository.getAllUsers();
+    }
+    /**
+     * Delete all users and admins
+     */
+    async deleteAllUsers() {
+        return this.userRepository.deleteAllUsers();
     }
 }

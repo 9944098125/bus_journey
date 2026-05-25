@@ -12,7 +12,8 @@ import type {
 
 import { UserRepository } from "../repositories/user.repository.js";
 
-import { signToken } from "../utils/jwt.js";
+import { buildFirstLoginLink } from "../utils/loginLink.js";
+import { signFirstLoginToken, signToken } from "../utils/jwt.js";
 
 export class UserService {
 	private readonly userRepository = new UserRepository();
@@ -44,11 +45,58 @@ export class UserService {
 
 		const hashedPassword = await bcrypt.hash(data.password as string, 10);
 
-		return this.userRepository.createUser({
+		const user = await this.userRepository.createUser({
 			...data,
 
 			password: hashedPassword,
+
+			is_verified: false,
 		});
+
+		const firstLoginToken = signFirstLoginToken({
+			userId: user._id.toString(),
+			email: user.email,
+			role: user.role,
+		});
+
+		const loginLink = buildFirstLoginLink(firstLoginToken);
+
+		const userResponse = await this.userRepository.findUserById(
+			user._id.toString(),
+		);
+
+		if (!userResponse) {
+			throw new Error("User not found");
+		}
+
+		return {
+			user: userResponse,
+			loginLink,
+			firstLoginToken,
+		};
+	}
+
+	/**
+	 * Complete first login using the magic link token (marks user as verified).
+	 */
+
+	public async verifyFirstLogin(userId: string) {
+		const user = await this.userRepository.markUserAsVerified(userId);
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		const token = signToken({
+			userId: user._id.toString(),
+			email: user.email,
+			role: user.role,
+		});
+
+		return {
+			user,
+			token,
+		};
 	}
 
 	/**
@@ -79,6 +127,10 @@ export class UserService {
 
 		if (!isPasswordValid) {
 			throw new Error("Invalid credentials");
+		}
+
+		if (!user.is_verified) {
+			throw new Error("Account not activated. Use your registration login link first.");
 		}
 
 		const token = signToken({
@@ -194,5 +246,13 @@ export class UserService {
 
 	public async getAllUsers() {
 		return this.userRepository.getAllUsers();
+	}
+
+	/**
+	 * Delete all users and admins
+	 */
+
+	public async deleteAllUsers() {
+		return this.userRepository.deleteAllUsers();
 	}
 }
