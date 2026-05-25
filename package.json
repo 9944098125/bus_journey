@@ -1,0 +1,19 @@
+{
+	"name": "bus_journey",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"private": true,
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"start": "turbo run start"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.27.0",
+	"devDependencies": {
+		"turbo": "^2.9.14"
+	}
+}

@@ -1,0 +1,70 @@
+
+
+> bus_journey@0.1.0 build /Users/srini/Desktop/Projects/MERN_Stack_Projects/bus_journey/apps/frontend
+> cross-env NODE_ENV=production react-app-rewired build
+
+(node:13546) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+[1m[33mwarn[39m[22m - The class `ease-[cubic-bezier(0.34,1.2,0.64,1)]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(0.34,1.2,0.64,1)&rsqb;` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `ease-[cubic-bezier(0.4,0,0.2,1)]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb;` to silence this warning.
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[33mCompiled with warnings.[39m
+[33m[39m
+[eslint] 
+src/app/components/layout/components/sidebar.tsx
+  [1mLine 1:16:[22m    Replace `·useCallback,·useEffect,·useMemo,·useRef,·useState·` with `⏎··useCallback,⏎··useEffect,⏎··useMemo,⏎··useRef,⏎··useState,⏎`                                        [33m[4mprettier/prettier[24m[39m
+  [1mLine 108:32:[22m  Delete `⏎···········`                                                                                                                                                      [33m[4mprettier/prettier[24m[39m
+  [1mLine 295:41:[22m  Replace `⏎··················collapsed,⏎··················showExpandedLabels,⏎··················isActive,⏎················` with `collapsed,·showExpandedLabels,·isActive`  [33m[4mprettier/prettier[24m[39m
+
+src/app/components/ui/input.tsx
+  [1mLine 5:28:[22m  Delete `⏎·`  [33m[4mprettier/prettier[24m[39m
+
+src/app/pages/Login/components/LoginForm.tsx
+  [1mLine 61:29:[22m  Replace `⏎··············register={register}⏎··············errors={errors}⏎··············isActive⏎···········` with `·register={register}·errors={errors}·isActive`  [33m[4mprettier/prettier[24m[39m
+
+src/app/pages/Register/components/RegisterNameEmailFields.tsx
+  [1mLine 31:27:[22m  Replace `INPUT_CLASS,·'pl-11',·errors.full_name·&&·'border-red-400'` with `⏎··············INPUT_CLASS,⏎··············'pl-11',⏎··············errors.full_name·&&·'border-red-400',⏎············`  [33m[4mprettier/prettier[24m[39m
+  [1mLine 61:27:[22m  Replace `INPUT_CLASS,·'pl-11',·errors.email·&&·'border-red-400'` with `⏎··············INPUT_CLASS,⏎··············'pl-11',⏎··············errors.email·&&·'border-red-400',⏎············`          [33m[4mprettier/prettier[24m[39m
+
+src/app/pages/Register/components/RegisterPasswordFields.tsx
+  [1mLine 98:25:[22m  Replace `⏎··············showConfirmPassword·?·'Hide·password'·:·'Show·password'⏎············` with `showConfirmPassword·?·'Hide·password'·:·'Show·password'`  [33m[4mprettier/prettier[24m[39m
+
+Search for the [4m[33mkeywords[39m[24m to learn more about each warning.
+To ignore, add [36m// eslint-disable-next-line[39m to the line before.
+
+File sizes after gzip:
+
+  175.31 kB  [2mbuild/static/js/[22m[36mmain.b1636154.js[39m
+  28.43 kB   [2mbuild/static/js/[22m[36m478.af3938b4.chunk.js[39m
+  24.35 kB   [2mbuild/static/css/[22m[36m478.8873206a.chunk.css[39m
+  10.73 kB   [2mbuild/static/css/[22m[36mmain.e096db63.css[39m
+  5.73 kB    [2mbuild/static/js/[22m[36m902.1eeb3705.chunk.js[39m
+  4.61 kB    [2mbuild/static/js/[22m[36m643.f4f25520.chunk.js[39m
+  436 B      [2mbuild/static/js/[22m[36m266.79239831.chunk.js[39m
+
+The project was built assuming it is hosted at [32m/[39m.
+You can control this with the [32mhomepage[39m field in your [36mpackage.json[39m.
+
+The [36mbuild[39m folder is ready to be deployed.
+You may serve it with a static server:
+
+  [36myarn[39m global add serve
+  [36mserve[39m -s build
+
+Find out more about deployment here:
+
+  [33mhttps://cra.link/deployment[39m
+
