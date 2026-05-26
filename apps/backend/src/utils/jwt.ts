@@ -1,5 +1,7 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 
+import type { UserRole } from "../interfaces/user.interface.js";
+
 const JWT_SECRET = process.env.JWT_SECRET ?? "bus-journey-dev-secret";
 
 const signOptions: SignOptions = {
@@ -14,7 +16,7 @@ const firstLoginSignOptions: SignOptions = {
 export interface JwtPayload {
 	userId: string;
 	email: string;
-	role: "USER" | "ADMIN";
+	role: UserRole;
 }
 
 export interface FirstLoginTokenPayload extends JwtPayload {

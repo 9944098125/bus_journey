@@ -1,6 +1,6 @@
 import { Users } from "../models/user.model.js";
 
-import type { IUser } from "../interfaces/user.interface.js";
+import type { IUser, UserRole } from "../interfaces/user.interface.js";
 
 export class UserRepository {
 	/**
@@ -42,13 +42,13 @@ export class UserRepository {
 		if (credentials.email) {
 			return Users.findOne({
 				email: credentials.email.toLowerCase(),
-			});
+			}).select("+password");
 		}
 
 		if (credentials.phone_number) {
 			return Users.findOne({
 				phone_number: credentials.phone_number,
-			});
+			}).select("+password");
 		}
 
 		return null;
@@ -118,7 +118,7 @@ export class UserRepository {
 			return {
 				deletedCount: 0,
 				names: [] as string[],
-				deletedUsers: [] as { full_name: string; role: "USER" | "ADMIN" }[],
+				deletedUsers: [] as { full_name: string; role: UserRole }[],
 			};
 		}
 

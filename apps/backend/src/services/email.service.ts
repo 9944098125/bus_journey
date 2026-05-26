@@ -1,10 +1,11 @@
 import { getEmailFromAddress, getMailTransporter } from "../config/mailer.js";
+import type { UserRole } from "../interfaces/user.interface.js";
 
 interface FirstLoginEmailParams {
 	to: string;
 	fullName: string;
 	loginLink: string;
-	role: "USER" | "ADMIN";
+	role: UserRole;
 }
 
 export class EmailService {
@@ -17,7 +18,8 @@ export class EmailService {
 		const transporter = getMailTransporter();
 		const from = getEmailFromAddress();
 		const appName = process.env.APP_NAME?.trim() || "Bus Journey";
-		const roleLabel = role === "ADMIN" ? "admin" : "user";
+		const roleLabel =
+			role === "ADMIN" ? "admin" : role === "OPERATOR" ? "operator" : "user";
 
 		try {
 			const result = await transporter.sendMail({
