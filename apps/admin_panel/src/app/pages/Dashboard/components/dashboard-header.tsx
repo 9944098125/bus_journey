@@ -5,7 +5,15 @@ import { Sparkles, Users } from 'lucide-react';
 import { selectUser } from 'app/slice/selectors';
 import { getUserDisplayName } from 'utils/user-display';
 
-export function DashboardHeader() {
+type DashboardHeaderProps = {
+  isLive?: boolean;
+  isRefreshing?: boolean;
+};
+
+export function DashboardHeader({
+  isLive = false,
+  isRefreshing = false,
+}: DashboardHeaderProps) {
   const user = useSelector(selectUser);
   const displayName = getUserDisplayName(user);
   const today = new Date().toLocaleDateString('en-IN', {
@@ -26,8 +34,8 @@ export function DashboardHeader() {
           Welcome back, {displayName.split(' ')[0]}
         </h1>
         <p className="mt-1 max-w-xl text-[1.35rem] text-sea-mid/75">
-          User directory health, roles, wallets, and verification — aligned with
-          your account model.
+          User directory health, roles, wallets, and verification — live from
+          your database.
         </p>
       </div>
       <div className="admin-card-surface flex shrink-0 items-center gap-3 rounded-2xl border px-4 py-3">
@@ -37,7 +45,11 @@ export function DashboardHeader() {
         <div className="text-left">
           <p className="text-[1.1rem] font-medium text-sea-mid/70">{today}</p>
           <p className="text-[1.25rem] font-semibold text-sea-deep">
-            Static preview · API soon
+            {isRefreshing
+              ? 'Refreshing…'
+              : isLive
+                ? 'Live data'
+                : 'Loading…'}
           </p>
         </div>
       </div>

@@ -65,7 +65,15 @@ export class UserRepository {
 	public async markUserAsVerified(id: string) {
 		return Users.findByIdAndUpdate(
 			id,
-			{ is_verified: true },
+			{ is_verified: true, last_login_at: new Date() },
+			{ new: true, runValidators: true },
+		).select("-password");
+	}
+
+	public async recordLastLogin(id: string) {
+		return Users.findByIdAndUpdate(
+			id,
+			{ last_login_at: new Date() },
 			{ new: true, runValidators: true },
 		).select("-password");
 	}

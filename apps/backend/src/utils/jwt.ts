@@ -44,3 +44,15 @@ export const verifyFirstLoginToken = (token: string): FirstLoginTokenPayload => 
 
 	return decoded;
 };
+
+export const verifyToken = (token: string): JwtPayload => {
+	const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload & {
+		purpose?: string;
+	};
+
+	if (decoded.purpose === "first_login") {
+		throw new Error("Invalid access token");
+	}
+
+	return decoded;
+};

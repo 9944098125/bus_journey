@@ -1,50 +1,46 @@
 import React from 'react';
 import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 import { Progress } from 'app/components/ui/progress';
 
-import { DASHBOARD_KPIS } from '../utils/dashboard-mock-data';
+import { useDashboardData } from '../hooks/use-dashboard';
 
 export function AccountHealthCard() {
-  const k = DASHBOARD_KPIS;
-  const verifiedPct = Math.round((k.verifiedUsers / k.totalUsers) * 100);
-  const activePct = Math.round((k.activeUsers / k.totalUsers) * 100);
-  const inactivePct = Math.round((k.inactiveUsers / k.totalUsers) * 100);
-  const pendingPct = Math.round((k.pendingVerification / k.totalUsers) * 100);
+  const { analytics } = useDashboardData();
+  const health = analytics.accountHealth;
 
-  const metrics = [
+  const metrics: {
+    label: string;
+    data: typeof health.verified;
+    icon: LucideIcon;
+    color: string;
+    textColor: string;
+  }[] = [
     {
       label: 'Verified',
-      field: 'is_verified',
-      value: verifiedPct,
-      count: k.verifiedUsers,
+      data: health.verified,
       icon: CheckCircle2,
       color: 'from-emerald-500 to-teal-500',
       textColor: 'text-emerald-600',
     },
     {
       label: 'Active',
-      field: 'is_active',
-      value: activePct,
-      count: k.activeUsers,
+      data: health.active,
       icon: CheckCircle2,
       color: 'from-sea-mid to-sea-bright',
       textColor: 'text-sea-mid',
     },
     {
       label: 'Pending verification',
-      field: 'is_verified: false',
-      value: pendingPct,
-      count: k.pendingVerification,
+      data: health.pendingVerification,
       icon: AlertCircle,
       color: 'from-amber-500 to-orange-500',
       textColor: 'text-amber-600',
     },
     {
       label: 'Inactive',
-      field: 'is_active: false',
-      value: inactivePct,
-      count: k.inactiveUsers,
+      data: health.inactive,
       icon: XCircle,
       color: 'from-slate-400 to-slate-500',
       textColor: 'text-slate-600',
@@ -52,7 +48,7 @@ export function AccountHealthCard() {
   ];
 
   return (
-    <article className="admin-card-surface rounded-2xl border p-5 sm:p-6">
+    <article className="admin-card-surface flex h-full w-full min-h-0 flex-col rounded-2xl border p-5 sm:p-6">
       <header className="mb-5">
         <h2 className="text-[1.6rem] font-bold text-sea-deep">Account health</h2>
         <p className="mt-0.5 text-[1.2rem] text-sea-mid/70">
@@ -73,16 +69,16 @@ export function AccountHealthCard() {
                   <span className="font-semibold text-sea-deep">{m.label}</span>
                 </div>
                 <span className={`text-[1.3rem] font-bold ${m.textColor}`}>
-                  {m.value}%
+                  {m.data.percentage}%
                 </span>
               </div>
               <Progress
-                value={m.value}
+                value={m.data.percentage}
                 indicatorClassName={`bg-gradient-to-r ${m.color}`}
               />
               <p className="mt-2 text-[1.1rem] text-sea-mid/65">
-                {m.count.toLocaleString('en-IN')} users ·{' '}
-                <span className="font-mono text-[1rem]">{m.field}</span>
+                {m.data.count.toLocaleString('en-IN')} users ·{' '}
+                <span className="font-mono text-[1rem]">{m.data.field}</span>
               </p>
             </li>
           );

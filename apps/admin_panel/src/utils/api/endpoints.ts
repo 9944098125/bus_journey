@@ -52,4 +52,31 @@ export const endpoints = {
     url: '/users/upload-profile-picture',
     method: HTTP_METHODS.POST,
   },
+  /** Admin dashboard — requires ADMIN JWT */
+  dashboard: {
+    full: {
+      url: '/admin/dashboard',
+      method: HTTP_METHODS.GET,
+    },
+    kpis: {
+      url: '/admin/dashboard/kpis',
+      method: HTTP_METHODS.GET,
+    },
+    quickActions: {
+      url: '/admin/dashboard/quick-actions',
+      method: HTTP_METHODS.GET,
+    },
+    analytics: {
+      url: '/admin/dashboard/analytics',
+      method: HTTP_METHODS.GET,
+    },
+    walletRewards: {
+      url: '/admin/dashboard/wallet-rewards',
+      method: HTTP_METHODS.GET,
+    },
+    recentAccounts: {
+      url: '/admin/dashboard/recent-accounts',
+      method: HTTP_METHODS.GET,
+    },
+  },
 };

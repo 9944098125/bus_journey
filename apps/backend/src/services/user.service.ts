@@ -51,6 +51,7 @@ export class UserService {
 			...data,
 			email,
 			password: hashedPassword,
+			auth_provider: data.auth_provider ?? "LOCAL",
 			is_verified: false,
 		});
 
@@ -144,6 +145,8 @@ export class UserService {
 		if (!user.is_verified) {
 			throw new Error("Account not activated. Use your registration login link first.");
 		}
+
+		await this.userRepository.recordLastLogin(user._id.toString());
 
 		const token = signToken({
 			userId: user._id.toString(),

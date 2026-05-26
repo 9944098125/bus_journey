@@ -4,12 +4,8 @@ import { Gift, Wallet } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'app/components/ui/tabs';
 import { cn } from 'utils/twm';
 
-import {
-  DASHBOARD_KPIS,
-  TOP_REWARD_USERS,
-  TOP_WALLET_USERS,
-} from '../utils/dashboard-mock-data';
 import { formatCurrency } from '../utils/dashboard-utils';
+import { useDashboardData, useDashboardLimits } from '../hooks/use-dashboard';
 
 function UserRankRow({
   rank,
@@ -47,32 +43,40 @@ function UserRankRow({
       <span className="shrink-0 font-bold text-sea-deep">
         {valueLabel === 'wallet_balance'
           ? formatCurrency(value)
-          : value.toLocaleString('en-IN')}
+          : (Number.isFinite(value) ? value : 0).toLocaleString('en-IN')}
       </span>
     </li>
   );
 }
 
 export function WalletRewardsPanel() {
+  const { analytics } = useDashboardData();
+  const { topLimit } = useDashboardLimits();
+  const walletRewards = analytics.walletRewards;
+
   return (
-    <article className="admin-card-surface rounded-2xl border p-5 sm:p-6">
+    <article className="admin-card-surface flex h-full w-full min-h-[16rem] flex-1 flex-col rounded-2xl border p-5 sm:p-6">
       <header className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-[1.6rem] font-bold text-sea-deep">
             Wallet & rewards
           </h2>
           <p className="mt-0.5 text-[1.2rem] text-sea-mid/70">
-            Numeric fields from IUser — min 0
+            Highest balances and reward points — top {topLimit} users per tab
           </p>
         </div>
         <div className="flex gap-2">
           <span className="inline-flex items-center gap-1 rounded-lg bg-sea-pale/60 px-2 py-1 text-[1.05rem] font-semibold text-sea-deep">
             <Wallet className="size-3.5" aria-hidden />
-            {formatCurrency(DASHBOARD_KPIS.totalWalletBalance)}
+            {formatCurrency(walletRewards.totalWalletBalance)}
           </span>
           <span className="inline-flex items-center gap-1 rounded-lg bg-violet-100 px-2 py-1 text-[1.05rem] font-semibold text-violet-800">
             <Gift className="size-3.5" aria-hidden />
-            {DASHBOARD_KPIS.totalRewardPoints.toLocaleString('en-IN')} pts
+            {(Number.isFinite(walletRewards.totalRewardPoints)
+              ? walletRewards.totalRewardPoints
+              : 0
+            ).toLocaleString('en-IN')}{' '}
+            pts
           </span>
         </div>
       </header>
@@ -104,28 +108,40 @@ export function WalletRewardsPanel() {
         </TabsList>
         <TabsContent value="wallet" className="mt-0">
           <ul className="space-y-2">
-            {TOP_WALLET_USERS.map((u, i) => (
-              <UserRankRow
-                key={u.id}
-                rank={i + 1}
-                name={u.full_name}
-                value={u.wallet_balance}
-                valueLabel="wallet_balance"
-              />
-            ))}
+            {walletRewards.topWalletUsers.length === 0 ? (
+              <li className="py-4 text-center text-[1.2rem] text-sea-mid/65">
+                No users yet
+              </li>
+            ) : (
+              walletRewards.topWalletUsers.map((u, i) => (
+                <UserRankRow
+                  key={u.id}
+                  rank={i + 1}
+                  name={u.full_name}
+                  value={u.wallet_balance ?? 0}
+                  valueLabel="wallet_balance"
+                />
+              ))
+            )}
           </ul>
         </TabsContent>
         <TabsContent value="rewards" className="mt-0">
           <ul className="space-y-2">
-            {TOP_REWARD_USERS.map((u, i) => (
-              <UserRankRow
-                key={u.id}
-                rank={i + 1}
-                name={u.full_name}
-                value={u.reward_points}
-                valueLabel="reward_points"
-              />
-            ))}
+            {walletRewards.topRewardUsers.length === 0 ? (
+              <li className="py-4 text-center text-[1.2rem] text-sea-mid/65">
+                No users yet
+              </li>
+            ) : (
+              walletRewards.topRewardUsers.map((u, i) => (
+                <UserRankRow
+                  key={u.id}
+                  rank={i + 1}
+                  name={u.full_name}
+                  value={u.reward_points ?? 0}
+                  valueLabel="reward_points"
+                />
+              ))
+            )}
           </ul>
         </TabsContent>
       </Tabs>

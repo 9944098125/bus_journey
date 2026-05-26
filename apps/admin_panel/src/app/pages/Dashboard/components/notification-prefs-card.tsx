@@ -4,15 +4,14 @@ import { Bell, Mail, MessageSquare } from 'lucide-react';
 import { Progress } from 'app/components/ui/progress';
 import { Switch } from 'app/components/ui/switch';
 
-import { DASHBOARD_KPIS } from '../utils/dashboard-mock-data';
+import { useDashboardData } from '../hooks/use-dashboard';
 
 export function NotificationPrefsCard() {
-  const k = DASHBOARD_KPIS;
-  const emailPct = Math.round((k.emailNotificationsOn / k.totalUsers) * 100);
-  const smsPct = Math.round((k.smsNotificationsOn / k.totalUsers) * 100);
+  const { analytics } = useDashboardData();
+  const prefs = analytics.notificationPreferences;
 
   return (
-    <article className="admin-card-surface rounded-2xl border p-5 sm:p-6">
+    <article className="admin-card-surface flex h-full w-full min-h-[22rem] flex-col rounded-2xl border p-5 sm:p-6">
       <header className="mb-5 flex items-center gap-2">
         <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-sea-mid to-sea-bright text-white">
           <Bell className="size-5" aria-hidden />
@@ -35,11 +34,13 @@ export function NotificationPrefsCard() {
               <Mail className="size-4 text-sea-mid" aria-hidden />
               <span className="font-semibold text-sea-deep">Email opt-in</span>
             </div>
-            <span className="font-bold text-sea-deep">{emailPct}%</span>
+            <span className="font-bold text-sea-deep">
+              {prefs.emailOptInPercent}%
+            </span>
           </div>
-          <Progress value={emailPct} />
+          <Progress value={prefs.emailOptInPercent} />
           <p className="mt-1 text-[1.1rem] text-sea-mid/65">
-            {k.emailNotificationsOn.toLocaleString('en-IN')} users enabled
+            {prefs.emailNotificationsOn.toLocaleString('en-IN')} users enabled
           </p>
         </div>
         <div>
@@ -48,30 +49,38 @@ export function NotificationPrefsCard() {
               <MessageSquare className="size-4 text-sea-mid" aria-hidden />
               <span className="font-semibold text-sea-deep">SMS opt-in</span>
             </div>
-            <span className="font-bold text-sea-deep">{smsPct}%</span>
+            <span className="font-bold text-sea-deep">{prefs.smsOptInPercent}%</span>
           </div>
           <Progress
-            value={smsPct}
+            value={prefs.smsOptInPercent}
             indicatorClassName="bg-gradient-to-r from-violet-500 to-purple-500"
           />
           <p className="mt-1 text-[1.1rem] text-sea-mid/65">
-            {k.smsNotificationsOn.toLocaleString('en-IN')} users enabled
+            {prefs.smsNotificationsOn.toLocaleString('en-IN')} users enabled
           </p>
         </div>
       </div>
 
       <div className="mt-5 rounded-xl border border-dashed border-sea-light/60 bg-sea-foam/40 p-4">
         <p className="mb-3 text-[1.15rem] font-medium text-sea-mid/80">
-          Example preference toggles (static preview)
+          Platform-wide preference summary
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
           <label className="flex cursor-default items-center gap-3">
-            <Switch checked disabled aria-readonly />
-            <span className="text-[1.2rem] text-sea-deep">Email alerts</span>
+            <Switch
+              checked={prefs.emailOptInPercent > 50}
+              disabled
+              aria-readonly
+            />
+            <span className="text-[1.2rem] text-sea-deep">Email majority on</span>
           </label>
           <label className="flex cursor-default items-center gap-3">
-            <Switch checked={false} disabled aria-readonly />
-            <span className="text-[1.2rem] text-sea-deep">SMS alerts</span>
+            <Switch
+              checked={prefs.smsOptInPercent > 50}
+              disabled
+              aria-readonly
+            />
+            <span className="text-[1.2rem] text-sea-deep">SMS majority on</span>
           </label>
         </div>
       </div>

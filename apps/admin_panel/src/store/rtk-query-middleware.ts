@@ -1,3 +1,7 @@
-import { api as GlobalApi } from 'app/slice/index';
+import { api as globalApi } from 'app/slice/index';
+import { dashboardApi } from 'app/pages/Dashboard/slice';
 
-export const rtkQueryMiddleware = [GlobalApi.middleware];
+export const rtkQueryMiddleware = [
+  globalApi.middleware,
+  dashboardApi.middleware,
+];

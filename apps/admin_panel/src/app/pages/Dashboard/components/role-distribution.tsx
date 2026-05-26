@@ -5,8 +5,8 @@ import { Progress } from 'app/components/ui/progress';
 import { cn } from 'utils/twm';
 import type { UserRole } from 'types/user';
 
-import { ROLE_BREAKDOWN } from '../utils/dashboard-mock-data';
 import { ROLE_LABELS } from '../utils/dashboard-utils';
+import { useDashboardData } from '../hooks/use-dashboard';
 import { RoleBadge } from './role-badge';
 
 const ROLE_ICONS: Record<UserRole, typeof Users> = {
@@ -22,8 +22,11 @@ const ROLE_BAR_COLORS: Record<UserRole, string> = {
 };
 
 export function RoleDistribution() {
+  const { analytics } = useDashboardData();
+  const roleBreakdown = analytics.roleBreakdown;
+
   return (
-    <article className="admin-card-surface rounded-2xl border p-5 sm:p-6">
+    <article className="admin-card-surface flex h-full w-full min-h-[22rem] flex-col rounded-2xl border p-5 sm:p-6">
       <header className="mb-5">
         <h2 className="text-[1.6rem] font-bold text-sea-deep">Role breakdown</h2>
         <p className="mt-0.5 text-[1.2rem] text-sea-mid/70">
@@ -31,7 +34,7 @@ export function RoleDistribution() {
         </p>
       </header>
       <ul className="space-y-4">
-        {ROLE_BREAKDOWN.map(item => {
+        {roleBreakdown.map(item => {
           const Icon = ROLE_ICONS[item.role];
           return (
             <li key={item.role}>

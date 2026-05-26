@@ -5,7 +5,7 @@ export const formatCurrency = (amount: number): string =>
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(Number.isFinite(amount) ? amount : 0);
 
 export const formatCompact = (n: number): string =>
   new Intl.NumberFormat('en-IN', {

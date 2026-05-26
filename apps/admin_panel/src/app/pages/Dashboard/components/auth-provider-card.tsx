@@ -3,23 +3,27 @@ import { Globe, KeyRound } from 'lucide-react';
 
 import { Progress } from 'app/components/ui/progress';
 import { cn } from 'utils/twm';
+import type { AuthProvider } from 'types/user';
 
-import { AUTH_PROVIDER_BREAKDOWN, DASHBOARD_KPIS } from '../utils/dashboard-mock-data';
 import { AUTH_PROVIDER_LABELS, formatCompact } from '../utils/dashboard-utils';
+import { useDashboardData } from '../hooks/use-dashboard';
 
-const PROVIDER_ICONS = {
+const PROVIDER_ICONS: Record<AuthProvider, typeof KeyRound> = {
   LOCAL: KeyRound,
   GOOGLE: Globe,
-} as const;
+};
 
-const PROVIDER_COLORS = {
+const PROVIDER_COLORS: Record<AuthProvider, string> = {
   LOCAL: 'from-sea-deep to-sea-mid',
   GOOGLE: 'from-rose-500 to-orange-500',
-} as const;
+};
 
 export function AuthProviderCard() {
+  const { kpis, analytics } = useDashboardData();
+  const authProviderBreakdown = analytics.authProviderBreakdown;
+
   return (
-    <article className="admin-card-surface rounded-2xl border p-5 sm:p-6">
+    <article className="admin-card-surface flex h-full w-full min-h-[22rem] flex-col rounded-2xl border p-5 sm:p-6">
       <header className="mb-5">
         <h2 className="text-[1.6rem] font-bold text-sea-deep">Auth providers</h2>
         <p className="mt-0.5 text-[1.2rem] text-sea-mid/70">
@@ -27,7 +31,7 @@ export function AuthProviderCard() {
         </p>
       </header>
       <div className="mb-6 grid grid-cols-2 gap-3">
-        {AUTH_PROVIDER_BREAKDOWN.map(item => {
+        {authProviderBreakdown.map(item => {
           const Icon = PROVIDER_ICONS[item.provider];
           return (
             <div
@@ -54,7 +58,7 @@ export function AuthProviderCard() {
         })}
       </div>
       <div className="space-y-3">
-        {AUTH_PROVIDER_BREAKDOWN.map(item => (
+        {authProviderBreakdown.map(item => (
           <div key={item.provider}>
             <div className="mb-1 flex justify-between text-[1.15rem]">
               <span className="font-medium text-sea-deep">{item.provider}</span>
@@ -71,8 +75,8 @@ export function AuthProviderCard() {
         ))}
       </div>
       <p className="mt-4 rounded-lg bg-sea-pale/40 px-3 py-2 text-[1.1rem] text-sea-mid/80">
-        {formatCompact(DASHBOARD_KPIS.googleAuthUsers)} users signed up via Google
-        SSO — password not stored locally.
+        {formatCompact(kpis.googleAuthUsers)} users signed up via Google SSO —
+        password not stored locally.
       </p>
     </article>
   );

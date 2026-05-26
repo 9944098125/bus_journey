@@ -30,3 +30,45 @@ Content-Type: application/json
   "email": "srinivas72075@gmail.com",
   "password": "SrinivasAkella@14"
 }
+
+@adminToken = PASTE_ADMIN_JWT_AFTER_LOGIN
+
+##### ADMIN DASHBOARD — full payload
+GET http://127.0.0.1:5001/api/admin/dashboard
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — KPI cards
+GET http://127.0.0.1:5001/api/admin/dashboard/kpis
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — quick actions counts
+GET http://127.0.0.1:5001/api/admin/dashboard/quick-actions
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — analytics bundle
+GET http://127.0.0.1:5001/api/admin/dashboard/analytics?topLimit=3
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — role breakdown
+GET http://127.0.0.1:5001/api/admin/dashboard/role-breakdown
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — auth providers
+GET http://127.0.0.1:5001/api/admin/dashboard/auth-providers
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — notification preferences
+GET http://127.0.0.1:5001/api/admin/dashboard/notification-preferences
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — account health
+GET http://127.0.0.1:5001/api/admin/dashboard/account-health
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — wallet & rewards
+GET http://127.0.0.1:5001/api/admin/dashboard/wallet-rewards?topLimit=3
+Authorization: Bearer {{adminToken}}
+
+##### ADMIN DASHBOARD — recent accounts
+GET http://127.0.0.1:5001/api/admin/dashboard/recent-accounts?limit=5&sort=createdAt&order=desc
+Authorization: Bearer {{adminToken}}

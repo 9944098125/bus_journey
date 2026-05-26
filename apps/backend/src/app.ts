@@ -5,6 +5,7 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 
+import adminDashboardRoutes from "./routes/admin-dashboard.route.js";
 import usersRoutes from "./routes/user.route.js";
 
 const app: Application = express();
@@ -78,6 +79,8 @@ app.get("/", (_req, res) => {
  */
 
 app.use("/api/users", usersRoutes);
+
+app.use("/api/admin/dashboard", adminDashboardRoutes);
 
 /**
  * 404 handler
