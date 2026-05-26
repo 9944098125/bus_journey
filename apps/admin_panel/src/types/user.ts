@@ -1,4 +1,11 @@
-export type UserRole = 'USER' | 'ADMIN';
+export type UserRole = 'USER' | 'ADMIN' | 'OPERATOR';
+
+export type AuthProvider = 'LOCAL' | 'GOOGLE';
+
+export interface UserPreferences {
+  email_notifications: boolean;
+  sms_notifications: boolean;
+}
 
 export interface AuthUser {
   _id?: string;
@@ -6,9 +13,15 @@ export interface AuthUser {
   email: string;
   country_code?: string;
   phone_number?: string;
-  profile_picture?: string;
+  profile_picture?: string | null;
   role?: UserRole;
+  auth_provider?: AuthProvider;
   is_verified?: boolean;
+  is_active?: boolean;
+  wallet_balance?: number;
+  reward_points?: number;
+  last_login_at?: string;
+  preferences?: UserPreferences;
 }
 
 export interface RegisterPayload {
