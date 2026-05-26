@@ -16,7 +16,11 @@ import {
   DASHBOARD_KPI_SECTION,
   DASHBOARD_KPI_WIDE_ROW_GRID,
 } from '../utils/dashboard-layout';
-import { formatCompact, formatCurrency } from '../utils/dashboard-utils';
+import {
+  formatCompact,
+  formatCountLabel,
+  formatCurrency,
+} from '../utils/dashboard-utils';
 import { useDashboardData } from '../hooks/use-dashboard';
 import { StatCard } from './stat-card';
 
@@ -100,7 +104,7 @@ export function KpiGrid() {
           <KpiCell>
             <StatCard
               title="Staff & operators"
-              value={`${k.admins} admins · ${k.operators} operators`}
+              value={`${formatCountLabel(k.admins, 'admin')} · ${formatCountLabel(k.operators, 'operator')}`}
               subtitle="role: ADMIN | OPERATOR"
               icon={Shield}
               accent="violet"

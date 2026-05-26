@@ -24,6 +24,10 @@
   --input: 199 52% 82%;
   --ring: 199 100% 36%;
 
+  --muted: 199 55% 88%;
+  --muted-foreground: 201 35% 42%;
+  --radius: 0.5rem;
+
   --sidebar-width-collapsed: 4.5rem;
   --sidebar-expanded: 280px;
 

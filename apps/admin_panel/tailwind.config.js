@@ -106,10 +106,6 @@ module.exports = {
             height: '0',
           },
         },
-        'skeleton-shimmer': {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
-        },
       },
       fontSize: {
         DEFAULT: '1.4rem',
@@ -134,7 +130,6 @@ module.exports = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'skeleton-shimmer': 'skeleton-shimmer 1.6s ease-in-out infinite',
       },
     },
   },

@@ -63,3 +63,10 @@ export const AUTH_PROVIDER_LABELS: Record<AuthProvider, string> = {
   LOCAL: 'Email & password',
   GOOGLE: 'Google SSO',
 };
+
+/** e.g. `1 admin` or `3 admins` */
+export const formatCountLabel = (
+  count: number,
+  singular: string,
+  plural = `${singular}s`,
+): string => `${count} ${count === 1 ? singular : plural}`;
