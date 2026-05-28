@@ -21,14 +21,15 @@ const BAD_REQUEST_MESSAGES = new Set([
   "Country code cannot be empty",
   "Invalid operator id",
   "Invalid creator id",
+  "An operator must have at least one bus",
 ]);
 
 const NOT_FOUND_MESSAGES = new Set(["Operator not found"]);
 
 const getListFilters = (
   req: Request
-): Partial<Pick<IOperator, "is_active">> => {
-  const filters: Partial<Pick<IOperator, "is_active">> = {};
+): Partial<Pick<IOperator, "is_active">> & { search?: string } => {
+  const filters: Partial<Pick<IOperator, "is_active">> & { search?: string } = {};
 
   if (req.query.status === "inactive") {
     filters.is_active = false;
@@ -36,6 +37,10 @@ const getListFilters = (
     filters.is_active = true;
   } else if (req.query.is_active !== undefined) {
     filters.is_active = req.query.is_active === "true";
+  }
+  
+  if (typeof req.query.search === "string" && req.query.search.trim() !== "") {
+    filters.search = req.query.search.trim();
   }
 
   return filters;
@@ -242,69 +247,4 @@ export class OperatorController {
     }
   }
 
-  public async uploadDriverPhoto(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      if (!req.file) {
-        res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
-        return;
-      }
-
-      const uploadedImage = await this.operatorService.uploadDriverPhoto(
-        req.file.buffer
-      );
-      const imageUrl = uploadedImage.secure_url;
-
-      res.status(200).json({
-        success: true,
-        message: "Driver photo uploaded successfully",
-        imageUrl,
-        data: {
-          imageUrl,
-          publicId: uploadedImage.public_id,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  public async uploadDrivingLicense(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      if (!req.file) {
-        res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
-        return;
-      }
-
-      const uploadedImage = await this.operatorService.uploadDrivingLicense(
-        req.file.buffer
-      );
-      const imageUrl = uploadedImage.secure_url;
-
-      res.status(200).json({
-        success: true,
-        message: "Driving license uploaded successfully",
-        imageUrl,
-        data: {
-          imageUrl,
-          publicId: uploadedImage.public_id,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 }

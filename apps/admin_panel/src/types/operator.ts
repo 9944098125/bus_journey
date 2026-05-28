@@ -12,8 +12,6 @@ export type Operator = {
   country_code: string;
   phone_number: string;
   logo?: string;
-  driver_photo?: string;
-  driving_license?: string;
   gst_number?: string;
   address?: string;
   is_active: boolean;
@@ -40,17 +38,28 @@ export type OperatorMutationResponse = {
   data?: Operator;
 };
 
+export type OperatorBusPayload = {
+  _id?: string;
+  bus_name: string;
+  bus_number: string;
+  bus_type: string;
+  total_seats: number | string;
+  amenities: string;
+  photos?: string[];
+  driver_photo?: string;
+  driving_license?: string;
+};
+
 export type OperatorPayload = {
   operator_name: string;
   email: string;
   country_code: string;
   phone_number: string;
   logo?: string;
-  driver_photo?: string;
-  driving_license?: string;
   gst_number?: string;
   address?: string;
   is_active?: boolean;
+  buses?: OperatorBusPayload[];
 };
 
 export type UploadOperatorImageResponse = {

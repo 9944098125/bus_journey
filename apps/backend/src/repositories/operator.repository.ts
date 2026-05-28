@@ -35,11 +35,22 @@ export class OperatorRepository {
 		return Operators.findByIdAndDelete(id);
 	}
 
-	public async getAllOperators(filters: Partial<Pick<IOperator, "is_active">> = {}) {
-		const query: Partial<Pick<IOperator, "is_active">> = {};
+	public async getAllOperators(filters: Partial<Pick<IOperator, "is_active">> & { search?: string } = {}) {
+		const query: any = {};
 
 		if (typeof filters.is_active === "boolean") {
 			query.is_active = filters.is_active;
+		}
+
+		if (filters.search) {
+			const searchRegex = new RegExp(filters.search, "i");
+			query.$or = [
+				{ operator_name: searchRegex },
+				{ email: searchRegex },
+				{ phone_number: searchRegex },
+				{ address: searchRegex },
+				{ gst_number: searchRegex }
+			];
 		}
 
 		return Operators.find(query)

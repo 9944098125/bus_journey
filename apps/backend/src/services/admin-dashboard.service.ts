@@ -67,12 +67,10 @@ export class AdminDashboardService {
 		const kpis = await this.getKpis();
 
 		const [activeOperators, inactiveOperators] = await Promise.all([
-			this.repository.countByFilter({
-				role: "OPERATOR",
+			this.repository.countOperatorsByFilter({
 				is_active: true,
 			}),
-			this.repository.countByFilter({
-				role: "OPERATOR",
+			this.repository.countOperatorsByFilter({
 				is_active: false,
 			}),
 		]);
@@ -115,10 +113,16 @@ export class AdminDashboardService {
 
 	public async getRoleBreakdown(): Promise<RoleBreakdownItem[]> {
 		const rows = await this.repository.getRoleCounts();
-		const total = rows.reduce((sum, row) => sum + row.count, 0);
+		const operatorsCount = await this.repository.countOperatorsByFilter({});
+		
+		let total = rows.reduce((sum, row) => sum + row.count, 0) + operatorsCount;
 
 		return ALL_ROLES.map((role) => {
-			const count = rows.find((row) => row._id === role)?.count ?? 0;
+			let count = rows.find((row) => row._id === role)?.count ?? 0;
+			
+			if (role === "OPERATOR") {
+				count += operatorsCount;
+			}
 
 			return {
 				role,

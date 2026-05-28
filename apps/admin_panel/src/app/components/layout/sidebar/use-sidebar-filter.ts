@@ -3,15 +3,15 @@ import { useMemo } from 'react';
 import { sidebarNavGroups } from './sidebar-items';
 import type { SidebarNavGroup } from './sidebar.types';
 
-export function useSidebarFilter(query: string): SidebarNavGroup[] {
+export function useSidebarFilter(query: string, baseGroups: SidebarNavGroup[] = sidebarNavGroups): SidebarNavGroup[] {
   const normalized = query.trim().toLowerCase();
 
   return useMemo(() => {
     if (!normalized) {
-      return sidebarNavGroups;
+      return baseGroups;
     }
 
-    return sidebarNavGroups
+    return baseGroups
       .map(group => ({
         ...group,
         items: group.items.filter(item => {
@@ -27,5 +27,5 @@ export function useSidebarFilter(query: string): SidebarNavGroup[] {
         }),
       }))
       .filter(group => group.items.length > 0);
-  }, [normalized]);
+  }, [normalized, baseGroups]);
 }

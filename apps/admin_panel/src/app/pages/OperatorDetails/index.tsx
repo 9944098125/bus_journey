@@ -23,10 +23,9 @@ import {
   useDeleteOperatorMutation,
   useGetOperatorByIdQuery,
   useOperatorsSlice,
-  useUploadDriverPhotoMutation,
-  useUploadDrivingLicenseMutation,
   useUpdateOperatorMutation,
 } from 'app/pages/Operators/slice';
+import { useGetBusesQuery } from 'app/pages/Buses/slice';
 import type { OperatorPayload } from 'types/operator';
 import { parsePhoneFields } from 'utils/phone';
 import 'react-phone-input-2/lib/style.css';
@@ -53,6 +52,10 @@ const toErrorMessage = (error: unknown, fallback: string) => {
 
 const detailActionButtonBase =
   'h-14 rounded-2xl px-7 text-base font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2';
+const detailFieldControlClass =
+  'h-[50px] w-full rounded-xl border border-input bg-background text-base text-foreground placeholder:text-muted-foreground';
+const detailPhoneInputClass =
+  '!h-[50px] !w-full !rounded-xl !border !border-input !bg-background !pl-[56px] !text-base !text-foreground !placeholder:text-muted-foreground';
 
 export function OperatorDetails() {
   useOperatorsSlice();
@@ -63,12 +66,12 @@ export function OperatorDetails() {
   const { data, isLoading, isError } = useGetOperatorByIdQuery(id, {
     skip: !id,
   });
+  const { data: busesResponse, isFetching: isFetchingBuses } = useGetBusesQuery(
+    id ? { operator: id, limit: 100 } : undefined,
+    { skip: !id },
+  );
   const [updateOperator, { isLoading: isUpdating }] =
     useUpdateOperatorMutation();
-  const [uploadDriverPhoto, { isLoading: isDriverPhotoUploading }] =
-    useUploadDriverPhotoMutation();
-  const [uploadDrivingLicense, { isLoading: isLicenseUploading }] =
-    useUploadDrivingLicenseMutation();
   const [deleteOperator, { isLoading: isDeleting }] =
     useDeleteOperatorMutation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -78,20 +81,10 @@ export function OperatorDetails() {
     country_code: '+91',
     phone_number: '',
     logo: '',
-    driver_photo: '',
-    driving_license: '',
     gst_number: '',
     address: '',
     is_active: true,
   });
-  const [phoneCountry, setPhoneCountry] = useState<CountryData>(
-    DEFAULT_PHONE_COUNTRY,
-  );
-  const [selectedDriverPhotoName, setSelectedDriverPhotoName] = useState('');
-  const [driverPhotoUploadError, setDriverPhotoUploadError] = useState('');
-  const [selectedLicenseName, setSelectedLicenseName] = useState('');
-  const [licenseUploadError, setLicenseUploadError] = useState('');
-
   useEffect(() => {
     if (data?.data) {
       setFormState({
@@ -100,8 +93,6 @@ export function OperatorDetails() {
         country_code: data.data.country_code || '+91',
         phone_number: data.data.phone_number,
         logo: data.data.logo || '',
-        driver_photo: data.data.driver_photo || '',
-        driving_license: data.data.driving_license || '',
         gst_number: data.data.gst_number || '',
         address: data.data.address || '',
         is_active: data.data.is_active,
@@ -116,87 +107,6 @@ export function OperatorDetails() {
     setFormState(prev => ({ ...prev, [field]: value }));
   };
 
-  const validateImageFile = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      return 'Please upload a valid image file.';
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      return 'Image must be smaller than 5 MB.';
-    }
-
-    return '';
-  };
-
-  const onDriverPhotoChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const fileError = validateImageFile(file);
-    if (fileError) {
-      setDriverPhotoUploadError(fileError);
-      return;
-    }
-
-    setDriverPhotoUploadError('');
-    setSelectedDriverPhotoName(file.name);
-
-    try {
-      const uploadResult = await uploadDriverPhoto(file).unwrap();
-      onFieldChange('driver_photo', uploadResult.imageUrl);
-      toast({
-        variant: 'success',
-        title: 'Driver photo uploaded',
-        description: 'Image uploaded and ready to be saved on submit.',
-      });
-    } catch (error) {
-      setDriverPhotoUploadError(
-        toErrorMessage(error, 'Failed to upload driver photo. Try again.'),
-      );
-    } finally {
-      event.target.value = '';
-    }
-  };
-
-  const onDrivingLicenseChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const fileError = validateImageFile(file);
-    if (fileError) {
-      setLicenseUploadError(fileError);
-      return;
-    }
-
-    setLicenseUploadError('');
-    setSelectedLicenseName(file.name);
-
-    try {
-      const uploadResult = await uploadDrivingLicense(file).unwrap();
-      onFieldChange('driving_license', uploadResult.imageUrl);
-      toast({
-        variant: 'success',
-        title: 'Driving license uploaded',
-        description: 'Image uploaded and ready to be saved on submit.',
-      });
-    } catch (error) {
-      setLicenseUploadError(
-        toErrorMessage(error, 'Failed to upload driving license. Try again.'),
-      );
-    } finally {
-      event.target.value = '';
-    }
-  };
 
   const onUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -213,8 +123,6 @@ export function OperatorDetails() {
           formState.country_code.trim() || `+${phoneCountry.dialCode}`,
         phone_number: formState.phone_number.trim(),
         logo: formState.logo?.trim() || undefined,
-        driver_photo: formState.driver_photo?.trim() || undefined,
-        driving_license: formState.driving_license?.trim() || undefined,
         gst_number: formState.gst_number?.trim() || undefined,
         address: formState.address?.trim() || undefined,
       };
@@ -295,55 +203,87 @@ export function OperatorDetails() {
       <div className="mx-auto w-full max-w-[1800px] space-y-6 px-4 2xl:px-6">
         <div className="grid gap-6 lg:grid-cols-5 2xl:gap-8">
           <aside className="lg:col-span-1">
-            <section className="sticky top-4 rounded-3xl border border-white/60 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                Operator Logo
-              </h2>
-              {data.data.logo ? (
-                <img
-                  src={data.data.logo}
-                  alt={`${data.data.operator_name} logo`}
-                  className="h-48 w-full rounded-2xl border border-slate-100 object-contain bg-slate-50 p-3"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-3 text-center text-sm text-slate-500">
-                  No logo URL added
-                </div>
-              )}
-              <div className="mt-4">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Driver Photo
-                </h3>
-                {formState.driver_photo ? (
+            <div className="sticky top-4 space-y-4">
+              <section className="rounded-3xl border border-white/60 bg-white p-5 shadow-sm">
+                <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Operator Logo
+                </h2>
+                {data.data.logo ? (
                   <img
-                    src={formState.driver_photo}
-                    alt={`${data.data.operator_name} driver`}
-                    className="h-44 w-full rounded-2xl border border-slate-100 object-cover bg-slate-50"
+                    src={data.data.logo}
+                    alt={`${data.data.operator_name} logo`}
+                    className="h-64 w-full rounded-2xl border border-slate-100 object-contain bg-slate-50 p-3"
+                    loading="lazy"
                   />
                 ) : (
-                  <div className="flex h-44 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
-                    No driver photo
+                  <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-3 text-center text-sm text-slate-500">
+                    No logo URL added
                   </div>
                 )}
-              </div>
-              <div className="mt-4">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Driving License
-                </h3>
-                {formState.driving_license ? (
-                  <img
-                    src={formState.driving_license}
-                    alt={`${data.data.operator_name} driving license`}
-                    className="h-44 w-full rounded-2xl border border-slate-100 object-cover bg-slate-50"
-                  />
+              </section>
+
+              <section className="rounded-3xl border border-white/60 bg-white p-5 shadow-sm">
+                <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Buses Available
+                </h2>
+                {isFetchingBuses ? (
+                  <p className="text-sm text-slate-500">Loading bus documents...</p>
+                ) : busesResponse?.data?.length ? (
+                  <div className="space-y-4">
+                    {busesResponse.data.map(bus => (
+                      <div
+                        key={bus._id}
+                        className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/70 p-3"
+                      >
+                        <p className="text-sm font-semibold text-slate-700">
+                          {bus.bus_name}
+                        </p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="mb-1 text-xs font-medium uppercase text-slate-500">
+                              Driver
+                            </p>
+                            {bus.driver_photo ? (
+                              <img
+                                src={bus.driver_photo}
+                                alt={`${bus.bus_name} driver`}
+                                className="h-32 w-full rounded-xl border border-slate-200 bg-white object-cover"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-xs text-slate-400">
+                                Not available
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="mb-1 text-xs font-medium uppercase text-slate-500">
+                              License
+                            </p>
+                            {bus.driving_license ? (
+                              <img
+                                src={bus.driving_license}
+                                alt={`${bus.bus_name} driving license`}
+                                className="h-32 w-full rounded-xl border border-slate-200 bg-white object-cover"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-xs text-slate-400">
+                                Not available
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <div className="flex h-44 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
-                    No driving license
-                  </div>
+                  <p className="text-sm text-slate-500">
+                    No buses found for this operator.
+                  </p>
                 )}
-              </div>
-            </section>
+              </section>
+            </div>
           </aside>
 
           <main className="space-y-5 lg:col-span-4">
@@ -401,7 +341,7 @@ export function OperatorDetails() {
                   <div className="space-y-1.5">
                     <Label htmlFor="operator_name">Operator Name</Label>
                     <Input
-                      className="h-12 rounded-xl"
+                      className={detailFieldControlClass}
                       id="operator_name"
                       value={formState.operator_name}
                       onChange={event =>
@@ -413,7 +353,7 @@ export function OperatorDetails() {
                   <div className="space-y-1.5">
                     <Label htmlFor="email">Email</Label>
                     <Input
-                      className="h-12 rounded-xl"
+                      className={detailFieldControlClass}
                       id="email"
                       type="email"
                       value={formState.email}
@@ -453,7 +393,7 @@ export function OperatorDetails() {
                         required: true,
                       }}
                       containerClass="register-phone-input w-full"
-                      inputClass="!h-12 !w-full !rounded-xl !border !border-input !bg-background !pl-[56px] !text-base !text-foreground !placeholder:text-muted-foreground"
+                      inputClass={detailPhoneInputClass}
                       buttonClass="!rounded-l-xl !border !border-input !bg-background"
                       dropdownClass="!rounded-xl !shadow-lg"
                     />
@@ -461,7 +401,7 @@ export function OperatorDetails() {
                   <div className="space-y-1.5">
                     <Label htmlFor="gst_number">GST Number</Label>
                     <Input
-                      className="h-12 rounded-xl"
+                      className={detailFieldControlClass}
                       id="gst_number"
                       value={formState.gst_number}
                       onChange={event =>
@@ -472,7 +412,7 @@ export function OperatorDetails() {
                   <div className="space-y-1.5 md:col-span-2 2xl:col-span-3">
                     <Label htmlFor="logo">Logo URL</Label>
                     <Input
-                      className="h-12 rounded-xl"
+                      className={detailFieldControlClass}
                       id="logo"
                       value={formState.logo}
                       onChange={event =>
@@ -483,164 +423,13 @@ export function OperatorDetails() {
                   <div className="space-y-1.5 md:col-span-2 2xl:col-span-3">
                     <Label htmlFor="address">Address</Label>
                     <Input
-                      className="h-12 rounded-xl"
+                      className={detailFieldControlClass}
                       id="address"
                       value={formState.address}
                       onChange={event =>
                         onFieldChange('address', event.target.value)
                       }
                     />
-                  </div>
-                  <div className="space-y-2 md:col-span-2 2xl:col-span-3">
-                    <Label htmlFor="driver_photo_upload_details">
-                      Driver Photo
-                    </Label>
-                    <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-slate-50 p-4">
-                      <div className="size-24 overflow-hidden rounded-2xl border bg-white shadow-sm">
-                        {formState.driver_photo ? (
-                          <img
-                            src={formState.driver_photo}
-                            alt="Driver avatar"
-                            className="size-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex size-full items-center justify-center text-slate-400">
-                            <ImagePlus className="size-5" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-[240px] flex-1 space-y-1">
-                        <p className="text-sm font-medium text-slate-700">
-                          {selectedDriverPhotoName || 'Upload driver photo'}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          JPG, PNG, WEBP up to 5MB
-                        </p>
-                        {driverPhotoUploadError && (
-                          <p className="text-xs font-medium text-rose-600">
-                            {driverPhotoUploadError}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-12 min-w-[220px] rounded-xl border-sky-200 bg-sky-50 text-sky-700 shadow-sm hover:bg-sky-100"
-                        onClick={() =>
-                          document
-                            .getElementById('driver_photo_upload_details')
-                            ?.click()
-                        }
-                        disabled={isDriverPhotoUploading || isUpdating}
-                      >
-                        {isDriverPhotoUploading ? (
-                          <Loader2 className="mr-2 size-4 animate-spin" />
-                        ) : (
-                          <UploadCloud className="mr-2 size-4" />
-                        )}
-                        {isDriverPhotoUploading
-                          ? 'Uploading...'
-                          : 'Choose Driver Photo'}
-                      </Button>
-                      {formState.driver_photo && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="h-11 rounded-xl border-rose-200 text-rose-700 hover:bg-rose-50"
-                          onClick={() => {
-                            onFieldChange('driver_photo', '');
-                            setSelectedDriverPhotoName('');
-                            setDriverPhotoUploadError('');
-                          }}
-                        >
-                          <Trash2 className="mr-2 size-4" />
-                          Remove
-                        </Button>
-                      )}
-                      <input
-                        id="driver_photo_upload_details"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={event => void onDriverPhotoChange(event)}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2 md:col-span-2 2xl:col-span-3">
-                    <Label htmlFor="driving_license_upload_details">
-                      Driving License
-                    </Label>
-                    <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-slate-50 p-4">
-                      <div className="size-24 overflow-hidden rounded-2xl border bg-white shadow-sm">
-                        {formState.driving_license ? (
-                          <img
-                            src={formState.driving_license}
-                            alt="Driving license"
-                            className="size-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex size-full items-center justify-center text-slate-400">
-                            <FileBadge2 className="size-5" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-[240px] flex-1 space-y-1">
-                        <p className="text-sm font-medium text-slate-700">
-                          {selectedLicenseName ||
-                            'Upload driving license image'}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          JPG, PNG, WEBP up to 5MB
-                        </p>
-                        {licenseUploadError && (
-                          <p className="text-xs font-medium text-rose-600">
-                            {licenseUploadError}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-12 min-w-[220px] rounded-xl border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm hover:bg-indigo-100"
-                        onClick={() =>
-                          document
-                            .getElementById('driving_license_upload_details')
-                            ?.click()
-                        }
-                        disabled={isLicenseUploading || isUpdating}
-                      >
-                        {isLicenseUploading ? (
-                          <Loader2 className="mr-2 size-4 animate-spin" />
-                        ) : (
-                          <UploadCloud className="mr-2 size-4" />
-                        )}
-                        {isLicenseUploading
-                          ? 'Uploading...'
-                          : 'Choose Driving License'}
-                      </Button>
-                      {formState.driving_license && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="h-11 rounded-xl border-rose-200 text-rose-700 hover:bg-rose-50"
-                          onClick={() => {
-                            onFieldChange('driving_license', '');
-                            setSelectedLicenseName('');
-                            setLicenseUploadError('');
-                          }}
-                        >
-                          <Trash2 className="mr-2 size-4" />
-                          Remove
-                        </Button>
-                      )}
-                      <input
-                        id="driving_license_upload_details"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={event => void onDrivingLicenseChange(event)}
-                      />
-                    </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-[#f2fbff] p-4">

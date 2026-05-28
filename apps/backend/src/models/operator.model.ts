@@ -31,14 +31,6 @@ const operatorsSchema = new Schema<IOperator>(
       type: String,
     },
 
-    driver_photo: {
-      type: String,
-    },
-
-    driving_license: {
-      type: String,
-    },
-
     gst_number: {
       type: String,
     },

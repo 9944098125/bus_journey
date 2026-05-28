@@ -1,4 +1,5 @@
 import { Users } from "../models/user.model.js";
+import { Operators } from "../models/operator.model.js";
 
 import type {
 	AuthProvider,
@@ -174,7 +175,11 @@ export class AdminDashboardRepository {
 	public async getKpis(): Promise<DashboardKpis> {
 		const { metrics, byRole } = await this.aggregateMetricsAndRoles();
 
-		return this.buildKpisFromAggregate(metrics, byRole);
+		const operatorsCount = await Operators.countDocuments();
+		const kpis = this.buildKpisFromAggregate(metrics, byRole);
+		kpis.operators = operatorsCount;
+
+		return kpis;
 	}
 
 	public async getRoleCounts(): Promise<RoleCountRow[]> {
@@ -192,6 +197,10 @@ export class AdminDashboardRepository {
 
 	public async countByFilter(filter: Record<string, unknown>): Promise<number> {
 		return Users.countDocuments(filter);
+	}
+
+	public async countOperatorsByFilter(filter: Record<string, unknown>): Promise<number> {
+		return Operators.countDocuments(filter);
 	}
 
 	public async findTopUsersByField(

@@ -7,6 +7,8 @@ import cloudinary from "../config/cloudinary.js";
 import type { IOperator } from "../interfaces/operator.interface.js";
 
 import { OperatorRepository } from "../repositories/operator.repository.js";
+import { busRepository } from "../repositories/bus.repository.js";
+import type { IBus } from "../interfaces/bus.interface.js";
 
 const OPERATOR_NOT_FOUND = "Operator not found";
 const INVALID_OPERATOR_ID = "Invalid operator id";
@@ -61,14 +63,6 @@ export class OperatorService {
     if (!data.country_code?.trim()) {
       throw new Error("Country code is required");
     }
-
-    if (!data.driver_photo?.trim()) {
-      throw new Error("Driver photo is required");
-    }
-
-    if (!data.driving_license?.trim()) {
-      throw new Error("Driving license is required");
-    }
   }
 
   private toUpdatePayload(data: Partial<IOperator>): Partial<IOperator> {
@@ -88,7 +82,11 @@ export class OperatorService {
     return payload;
   }
 
-  public async createOperator(data: Partial<IOperator>, createdById: string) {
+  public async createOperator(data: Partial<IOperator> & { buses?: Partial<IBus>[] }, createdById: string) {
+    if (!data.buses || data.buses.length === 0) {
+      throw new Error("An operator must have at least one bus");
+    }
+
     this.validateCreatePayload(data);
 
     if (!mongoose.isValidObjectId(createdById)) {
@@ -121,8 +119,6 @@ export class OperatorService {
       country_code,
       phone_number,
       logo: data.logo?.trim() || undefined,
-      driver_photo: data.driver_photo?.trim() || undefined,
-      driving_license: data.driving_license?.trim() || undefined,
       gst_number: data.gst_number?.trim() || undefined,
       address: data.address?.trim() || undefined,
       is_active: data.is_active ?? true,
@@ -132,6 +128,28 @@ export class OperatorService {
     const populated = await this.operatorRepository.findOperatorById(
       operator._id.toString()
     );
+
+    if (data.buses && data.buses.length > 0) {
+      for (const busData of data.buses) {
+        if (!busData.bus_name?.trim() || !busData.bus_number?.trim() || !busData.bus_type?.trim() || !busData.total_seats) {
+          continue; // Skip invalid buses or handle error
+        }
+        
+        await busRepository.createBus({
+          bus_name: busData.bus_name.trim(),
+          bus_number: busData.bus_number.trim().toUpperCase(),
+          bus_type: busData.bus_type.trim(),
+          total_seats: busData.total_seats,
+          operator: operator._id,
+          amenities: busData.amenities || [],
+          photos: busData.photos || [],
+          driver_photo: busData.driver_photo?.trim() || undefined,
+          driving_license: busData.driving_license?.trim() || undefined,
+          is_active: busData.is_active ?? true,
+          created_by: new mongoose.Types.ObjectId(createdById),
+        });
+      }
+    }
 
     if (!populated) {
       throw new Error(OPERATOR_NOT_FOUND);
@@ -153,12 +171,12 @@ export class OperatorService {
   }
 
   public async getAllOperators(
-    filters: Partial<Pick<IOperator, "is_active">> = {}
+    filters: Partial<Pick<IOperator, "is_active">> & { search?: string } = {}
   ) {
     return this.operatorRepository.getAllOperators(filters);
   }
 
-  public async updateOperator(id: string, data: Partial<IOperator>) {
+  public async updateOperator(id: string, data: Partial<IOperator> & { buses?: Partial<IBus>[] }) {
     this.assertValidObjectId(id);
 
     const existing = await this.operatorRepository.findOperatorById(id);
@@ -264,16 +282,6 @@ export class OperatorService {
       updatePayload.logo = updatePayload.logo.trim() || undefined;
     }
 
-    if (updatePayload.driver_photo !== undefined) {
-      updatePayload.driver_photo =
-        updatePayload.driver_photo.trim() || undefined;
-    }
-
-    if (updatePayload.driving_license !== undefined) {
-      updatePayload.driving_license =
-        updatePayload.driving_license.trim() || undefined;
-    }
-
     if (updatePayload.gst_number !== undefined) {
       updatePayload.gst_number = updatePayload.gst_number.trim() || undefined;
     }
@@ -289,6 +297,53 @@ export class OperatorService {
 
     if (!updatedOperator) {
       throw new Error(OPERATOR_NOT_FOUND);
+    }
+
+    if (data.buses) {
+      const existingBusesResult = await busRepository.getBuses({ operator: id }, 0, 1000);
+      const existingBuses = existingBusesResult.data;
+
+      const incomingBusIds = new Set(data.buses.filter(b => b._id).map(b => b._id!.toString()));
+
+      for (const existingBus of existingBuses) {
+        if (!incomingBusIds.has(existingBus._id.toString())) {
+          await busRepository.deleteBus(existingBus._id.toString());
+        }
+      }
+
+      for (const busData of data.buses) {
+        if (!busData.bus_name?.trim() || !busData.bus_number?.trim() || !busData.bus_type?.trim() || !busData.total_seats) {
+          continue;
+        }
+
+        if (busData._id) {
+          await busRepository.updateBus(busData._id.toString(), {
+            bus_name: busData.bus_name.trim(),
+            bus_number: busData.bus_number.trim().toUpperCase(),
+            bus_type: busData.bus_type.trim(),
+            total_seats: Number(busData.total_seats),
+            amenities: busData.amenities || [],
+            photos: busData.photos || [],
+            driver_photo: busData.driver_photo?.trim() || undefined,
+            driving_license: busData.driving_license?.trim() || undefined,
+            is_active: busData.is_active ?? true,
+          });
+        } else {
+          await busRepository.createBus({
+            bus_name: busData.bus_name.trim(),
+            bus_number: busData.bus_number.trim().toUpperCase(),
+            bus_type: busData.bus_type.trim(),
+            total_seats: Number(busData.total_seats),
+            operator: new mongoose.Types.ObjectId(id),
+            amenities: busData.amenities || [],
+            photos: busData.photos || [],
+            driver_photo: busData.driver_photo?.trim() || undefined,
+            driving_license: busData.driving_license?.trim() || undefined,
+            is_active: busData.is_active ?? true,
+            created_by: existing.created_by,
+          });
+        }
+      }
     }
 
     return updatedOperator;
@@ -344,13 +399,5 @@ export class OperatorService {
 
       streamifier.createReadStream(fileBuffer).pipe(stream);
     });
-  }
-
-  public async uploadDriverPhoto(fileBuffer: Buffer) {
-    return this.uploadImageToCloudinary(fileBuffer, "driver-photos");
-  }
-
-  public async uploadDrivingLicense(fileBuffer: Buffer) {
-    return this.uploadImageToCloudinary(fileBuffer, "driving-licenses");
   }
 }

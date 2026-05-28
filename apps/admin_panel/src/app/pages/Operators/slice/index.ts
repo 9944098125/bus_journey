@@ -11,7 +11,6 @@ import type {
   OperatorMutationResponse,
   OperatorPayload,
   OperatorSingleResponse,
-  UploadOperatorImageResponse,
 } from 'types/operator';
 import { operatorsInitialState, selectEditingOperator } from './selectors';
 
@@ -42,7 +41,7 @@ export const operatorsApi = createApi({
   endpoints: build => ({
     getOperators: build.query<
       OperatorListResponse,
-      { is_active?: boolean } | undefined
+      { is_active?: boolean; search?: string } | undefined
     >({
       query: params => ({
         url: endpoints.operators.list.url,
@@ -110,72 +109,6 @@ export const operatorsApi = createApi({
         return formatErrors(baseQueryReturnValue.data);
       },
     }),
-    uploadDriverPhoto: build.mutation<
-      { imageUrl: string; publicId: string },
-      File
-    >({
-      query: file => {
-        const formData = new FormData();
-        formData.append('driver_photo', file);
-
-        return {
-          ...endpoints.operators.uploadDriverPhoto,
-          body: formData,
-          prepareHeaders: (headers: Headers) => {
-            headers.delete('Content-Type');
-            return headers;
-          },
-        };
-      },
-      transformResponse(response: UploadOperatorImageResponse) {
-        const imageUrl = response.imageUrl ?? response.data?.imageUrl;
-
-        if (!imageUrl) {
-          throw new Error('Upload succeeded but no image URL was returned');
-        }
-
-        return {
-          imageUrl,
-          publicId: response.data?.publicId ?? '',
-        };
-      },
-      transformErrorResponse(baseQueryReturnValue) {
-        return formatErrors(baseQueryReturnValue.data);
-      },
-    }),
-    uploadDrivingLicense: build.mutation<
-      { imageUrl: string; publicId: string },
-      File
-    >({
-      query: file => {
-        const formData = new FormData();
-        formData.append('driving_license', file);
-
-        return {
-          ...endpoints.operators.uploadDrivingLicense,
-          body: formData,
-          prepareHeaders: (headers: Headers) => {
-            headers.delete('Content-Type');
-            return headers;
-          },
-        };
-      },
-      transformResponse(response: UploadOperatorImageResponse) {
-        const imageUrl = response.imageUrl ?? response.data?.imageUrl;
-
-        if (!imageUrl) {
-          throw new Error('Upload succeeded but no image URL was returned');
-        }
-
-        return {
-          imageUrl,
-          publicId: response.data?.publicId ?? '',
-        };
-      },
-      transformErrorResponse(baseQueryReturnValue) {
-        return formatErrors(baseQueryReturnValue.data);
-      },
-    }),
   }),
 });
 
@@ -185,8 +118,6 @@ export const {
   useCreateOperatorMutation,
   useUpdateOperatorMutation,
   useDeleteOperatorMutation,
-  useUploadDriverPhotoMutation,
-  useUploadDrivingLicenseMutation,
 } = operatorsApi;
 
 export { selectEditingOperator } from './selectors';

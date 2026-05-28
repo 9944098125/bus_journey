@@ -14,6 +14,9 @@ import {
 } from 'utils/user-display';
 import { cn } from 'utils/twm';
 
+import { useBusesSlice, useGetBusesQuery } from 'app/pages/Buses/slice';
+import { useOperatorsSlice, useGetOperatorsQuery } from 'app/pages/Operators/slice';
+
 import SidebarGroup from './sidebar-group';
 import SidebarProfile from './sidebar-profile';
 import SidebarSearch from './sidebar-search';
@@ -22,6 +25,7 @@ import SidebarToggle from './sidebar-toggle';
 import {
   SIDEBAR_COLLAPSED_WIDTH,
   SIDEBAR_EXPANDED_WIDTH,
+  sidebarNavGroups,
 } from './sidebar-items';
 import { useSidebarFilter } from './use-sidebar-filter';
 import type { SidebarProfile as SidebarProfileType } from './sidebar.types';
@@ -48,7 +52,27 @@ function SidebarPanel({
   className,
 }: SidebarPanelProps) {
   const user = useSelector(selectUser);
-  const filteredGroups = useSidebarFilter(searchQuery);
+
+  useBusesSlice();
+  useOperatorsSlice();
+  const { data: busesResponse } = useGetBusesQuery({ limit: 1 });
+  const { data: operatorsResponse } = useGetOperatorsQuery(undefined);
+
+  const totalBuses = busesResponse?.total;
+  const totalOperators = operatorsResponse?.data?.length || (operatorsResponse as any)?.total;
+
+  const dynamicGroups = useMemo(() => {
+    return sidebarNavGroups.map(group => ({
+      ...group,
+      items: group.items.map(item => {
+        if (item.id === 'buses') return { ...item, badge: totalBuses !== undefined ? totalBuses : undefined };
+        if (item.id === 'operators') return { ...item, badge: totalOperators !== undefined ? totalOperators : undefined };
+        return item;
+      })
+    }));
+  }, [totalBuses, totalOperators]);
+
+  const filteredGroups = useSidebarFilter(searchQuery, dynamicGroups);
 
   const profile: SidebarProfileType = useMemo(
     () => ({

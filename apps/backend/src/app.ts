@@ -9,6 +9,8 @@ import adminDashboardRoutes from "./routes/admin-dashboard.route.js";
 import operatorsRoutes from "./routes/operator.route.js";
 import usersRoutes from "./routes/user.route.js";
 
+import busesRoutes from "./routes/bus.route.js";
+
 const app: Application = express();
 
 /**
@@ -82,6 +84,8 @@ app.get("/", (_req, res) => {
 app.use("/api/users", usersRoutes);
 
 app.use("/api/operators", operatorsRoutes);
+
+app.use("/api/buses", busesRoutes);
 
 app.use("/api/admin/dashboard", adminDashboardRoutes);
 

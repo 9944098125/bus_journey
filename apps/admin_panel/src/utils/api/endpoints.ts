@@ -83,14 +83,7 @@ export const endpoints = {
       url: '/operators',
       method: HTTP_METHODS.POST,
     },
-    uploadDriverPhoto: {
-      url: '/operators/upload-driver-photo',
-      method: HTTP_METHODS.POST,
-    },
-    uploadDrivingLicense: {
-      url: '/operators/upload-driving-license',
-      method: HTTP_METHODS.POST,
-    },
+
     byId: (id: string) => ({
       url: `/operators/${id}`,
       method: HTTP_METHODS.GET,
@@ -101,6 +94,40 @@ export const endpoints = {
     }),
     delete: (id: string) => ({
       url: `/operators/${id}`,
+      method: HTTP_METHODS.DELETE,
+    }),
+  },
+  buses: {
+    list: {
+      url: '/buses',
+      method: HTTP_METHODS.GET,
+    },
+    create: {
+      url: '/buses',
+      method: HTTP_METHODS.POST,
+    },
+    uploadDriverPhoto: {
+      url: '/buses/upload-driver-photo',
+      method: HTTP_METHODS.POST,
+    },
+    uploadDrivingLicense: {
+      url: '/buses/upload-driving-license',
+      method: HTTP_METHODS.POST,
+    },
+    uploadBusPhoto: {
+      url: '/buses/upload-bus-photo',
+      method: HTTP_METHODS.POST,
+    },
+    byId: (id: string) => ({
+      url: `/buses/${id}`,
+      method: HTTP_METHODS.GET,
+    }),
+    update: (id: string) => ({
+      url: `/buses/${id}`,
+      method: HTTP_METHODS.PATCH,
+    }),
+    delete: (id: string) => ({
+      url: `/buses/${id}`,
       method: HTTP_METHODS.DELETE,
     }),
   },

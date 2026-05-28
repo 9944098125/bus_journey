@@ -11,10 +11,6 @@ export interface IOperator extends Document {
 
   logo?: string;
 
-  driver_photo?: string;
-
-  driving_license?: string;
-
   gst_number?: string;
 
   address?: string;
