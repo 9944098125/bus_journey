@@ -1,0 +1,64 @@
+export type OperatorCreator = {
+  _id: string;
+  full_name?: string;
+  email?: string;
+  role?: string;
+};
+
+export type Operator = {
+  _id: string;
+  operator_name: string;
+  email: string;
+  country_code: string;
+  phone_number: string;
+  logo?: string;
+  driver_photo?: string;
+  driving_license?: string;
+  gst_number?: string;
+  address?: string;
+  is_active: boolean;
+  created_by?: string | OperatorCreator;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OperatorListResponse = {
+  success: boolean;
+  count: number;
+  data: Operator[];
+};
+
+export type OperatorSingleResponse = {
+  success: boolean;
+  message?: string;
+  data: Operator;
+};
+
+export type OperatorMutationResponse = {
+  success: boolean;
+  message: string;
+  data?: Operator;
+};
+
+export type OperatorPayload = {
+  operator_name: string;
+  email: string;
+  country_code: string;
+  phone_number: string;
+  logo?: string;
+  driver_photo?: string;
+  driving_license?: string;
+  gst_number?: string;
+  address?: string;
+  is_active?: boolean;
+};
+
+export type UploadOperatorImageResponse = {
+  success: boolean;
+  message?: string;
+  imageUrl?: string;
+  data?: {
+    imageUrl?: string;
+    publicId?: string;
+  };
+};

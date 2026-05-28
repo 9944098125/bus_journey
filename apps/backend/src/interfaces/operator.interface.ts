@@ -1,23 +1,29 @@
 import { Document, Types } from "mongoose";
 
 export interface IOperator extends Document {
-	operator_name: string;
+  operator_name: string;
 
-	email: string;
+  email: string;
 
-	phone_number: string;
+  country_code: string;
 
-	logo?: string;
+  phone_number: string;
 
-	gst_number?: string;
+  logo?: string;
 
-	address?: string;
+  driver_photo?: string;
 
-	is_active: boolean;
+  driving_license?: string;
 
-	created_by: Types.ObjectId;
+  gst_number?: string;
 
-	createdAt: Date;
+  address?: string;
 
-	updatedAt: Date;
+  is_active: boolean;
+
+  created_by: Types.ObjectId;
+
+  createdAt: Date;
+
+  updatedAt: Date;
 }

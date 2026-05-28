@@ -59,6 +59,7 @@ export function useRegisterForm() {
     }
 
     toast({
+      variant: 'success',
       title: 'Welcome aboard!',
       description:
         'Check your email for the activation link. After that, you can sign in here with your password.',
@@ -72,7 +73,7 @@ export function useRegisterForm() {
     }
 
     toast({
-      variant: 'destructive',
+      variant: 'error',
       title: 'Registration failed',
       description: getErrorMessage(
         registrationError,
@@ -87,7 +88,7 @@ export function useRegisterForm() {
     }
 
     toast({
-      variant: 'destructive',
+      variant: 'error',
       title: 'Upload failed',
       description: getErrorMessage(
         uploadError,
@@ -194,7 +195,7 @@ export function useRegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     if (selectedImage && !profilePictureUrl) {
       toast({
-        variant: 'destructive',
+        variant: 'error',
         title: 'Upload in progress',
         description: isUploading
           ? 'Please wait for your profile picture to finish uploading.'

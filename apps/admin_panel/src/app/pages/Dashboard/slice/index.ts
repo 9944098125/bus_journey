@@ -54,12 +54,12 @@ export const dashboardApi = createApi({
     /** Full dashboard — primary source for the admin dashboard page */
     getFullDashboard: build.query<
       DashboardApiResponse<FullDashboardData>,
-      FullDashboardQueryParams | void
+      FullDashboardQueryParams | undefined
     >({
-      query: (params = {}) => ({
+      query: params => ({
         url: endpoints.dashboard.full.url,
         method: endpoints.dashboard.full.method,
-        params,
+        ...(params ? { params } : {}),
       }),
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
@@ -89,12 +89,12 @@ export const dashboardApi = createApi({
     }),
     getDashboardAnalytics: build.query<
       DashboardApiResponse<DashboardAnalyticsData>,
-      { topLimit?: number } | void
+      { topLimit?: number } | undefined
     >({
-      query: (params = {}) => ({
+      query: params => ({
         url: endpoints.dashboard.analytics.url,
         method: endpoints.dashboard.analytics.method,
-        params,
+        ...(params ? { params } : {}),
       }),
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
@@ -102,12 +102,12 @@ export const dashboardApi = createApi({
     }),
     getDashboardWalletRewards: build.query<
       DashboardApiResponse<WalletRewardsData>,
-      WalletRewardsQueryParams | void
+      WalletRewardsQueryParams | undefined
     >({
-      query: (params = {}) => ({
+      query: params => ({
         url: endpoints.dashboard.walletRewards.url,
         method: endpoints.dashboard.walletRewards.method,
-        params,
+        ...(params ? { params } : {}),
       }),
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
@@ -115,12 +115,12 @@ export const dashboardApi = createApi({
     }),
     getDashboardRecentAccounts: build.query<
       RecentAccountsResponse,
-      RecentAccountsQueryParams | void
+      RecentAccountsQueryParams | undefined
     >({
-      query: (params = {}) => ({
+      query: params => ({
         url: endpoints.dashboard.recentAccounts.url,
         method: endpoints.dashboard.recentAccounts.method,
-        params,
+        ...(params ? { params } : {}),
       }),
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);

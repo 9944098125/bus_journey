@@ -13,6 +13,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NotFound } from './pages/NotFound/loadable';
 import { Login } from './pages/Login/loadable';
 import { Dashboard } from './pages/Dashboard/loadable';
+import { Operators } from './pages/Operators/loadable';
+import { OperatorDetails } from './pages/OperatorDetails/loadable';
 import { useTranslation } from 'react-i18next';
 import { useGlobalSlice } from './slice';
 import { RedirectIfAuth } from './components/auth/redirect-if-auth';
@@ -41,6 +43,8 @@ export function App() {
           <Route element={<RequireAuth />}>
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/operators" element={<Operators />} />
+              <Route path="/operators/:id" element={<OperatorDetails />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Route>

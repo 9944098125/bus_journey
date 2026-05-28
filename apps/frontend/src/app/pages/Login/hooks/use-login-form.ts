@@ -88,6 +88,7 @@ export function useLoginForm() {
     clearActivationTokenFromUrl();
 
     toast({
+      variant: 'success',
       title: 'Account activated!',
       description: 'You are signed in. You can use this page to log in next time.',
     });
@@ -112,7 +113,7 @@ export function useLoginForm() {
     clearActivationTokenFromUrl();
 
     toast({
-      variant: alreadyActive ? 'default' : 'destructive',
+      variant: alreadyActive ? 'success' : 'error',
       title: alreadyActive ? 'Account already active' : 'Activation failed',
       description: alreadyActive
         ? 'Sign in below with your email or phone and password.'
@@ -126,6 +127,7 @@ export function useLoginForm() {
     }
 
     toast({
+      variant: 'success',
       title: 'Welcome back!',
       description: 'You have logged in successfully.',
     });
@@ -143,7 +145,7 @@ export function useLoginForm() {
     );
 
     toast({
-      variant: 'destructive',
+      variant: 'error',
       title: 'Login failed',
       description: message,
     });

@@ -88,7 +88,7 @@ export function useDashboard() {
     }
 
     toast({
-      variant: 'destructive',
+      variant: 'error',
       title: 'Could not load dashboard',
       description: getErrorMessage(
         error,
