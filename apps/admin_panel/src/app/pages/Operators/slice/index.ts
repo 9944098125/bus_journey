@@ -92,6 +92,7 @@ export const operatorsApi = createApi({
       invalidatesTags: (_result, _error, { id }) => [
         { type: 'Operators', id: 'LIST' },
         { type: 'Operator', id },
+        { type: 'Buses', id: 'LIST' },
       ],
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);

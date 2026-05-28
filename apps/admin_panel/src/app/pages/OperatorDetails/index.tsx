@@ -3,15 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import PhoneInput from 'react-phone-input-2';
 import type { CountryData } from 'react-phone-input-2';
-import {
-  ArrowLeft,
-  FileBadge2,
-  ImagePlus,
-  Loader2,
-  Save,
-  Trash2,
-  UploadCloud,
-} from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Trash2 } from 'lucide-react';
 
 import { Button } from 'app/components/ui/button';
 import { ConfirmationDialog } from 'app/components/ui/confirmation-dialog';
@@ -19,6 +11,7 @@ import { Input } from 'app/components/ui/input';
 import Label from 'app/components/ui/label';
 import { Switch } from 'app/components/ui/switch';
 import { useToast } from 'app/components/ui/use-toast';
+import { OperatorBusesFormSection } from 'app/pages/Operators/components/OperatorBusesFormSection';
 import {
   useDeleteOperatorMutation,
   useGetOperatorByIdQuery,
@@ -26,7 +19,8 @@ import {
   useUpdateOperatorMutation,
 } from 'app/pages/Operators/slice';
 import { useGetBusesQuery } from 'app/pages/Buses/slice';
-import type { OperatorPayload } from 'types/operator';
+import type { OperatorBusPayload, OperatorPayload } from 'types/operator';
+import { selectValueToTotalSeats, totalSeatsToSelectValue } from 'utils/busSeats';
 import { parsePhoneFields } from 'utils/phone';
 import 'react-phone-input-2/lib/style.css';
 
@@ -57,48 +51,74 @@ const detailFieldControlClass =
 const detailPhoneInputClass =
   '!h-[50px] !w-full !rounded-xl !border !border-input !bg-background !pl-[56px] !text-base !text-foreground !placeholder:text-muted-foreground';
 
+const defaultFormState: OperatorPayload = {
+  operator_name: '',
+  email: '',
+  country_code: '+91',
+  phone_number: '',
+  logo: '',
+  gst_number: '',
+  address: '',
+  is_active: true,
+  buses: [],
+};
+
 export function OperatorDetails() {
   useOperatorsSlice();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { id = '' } = useParams<{ id: string }>();
+  const [phoneCountry, setPhoneCountry] = useState<CountryData>(DEFAULT_PHONE_COUNTRY);
 
-  const { data, isLoading, isError } = useGetOperatorByIdQuery(id, {
+  const { data, isLoading, isError, refetch: refetchOperator } =
+    useGetOperatorByIdQuery(id, {
+      skip: !id,
+    });
+  const {
+    data: busesResponse,
+    isFetching: isFetchingBuses,
+    refetch: refetchBuses,
+  } = useGetBusesQuery(id ? { operator: id, limit: 100 } : undefined, {
     skip: !id,
   });
-  const { data: busesResponse, isFetching: isFetchingBuses } = useGetBusesQuery(
-    id ? { operator: id, limit: 100 } : undefined,
-    { skip: !id },
-  );
   const [updateOperator, { isLoading: isUpdating }] =
     useUpdateOperatorMutation();
   const [deleteOperator, { isLoading: isDeleting }] =
     useDeleteOperatorMutation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [formState, setFormState] = useState<OperatorPayload>({
-    operator_name: '',
-    email: '',
-    country_code: '+91',
-    phone_number: '',
-    logo: '',
-    gst_number: '',
-    address: '',
-    is_active: true,
-  });
+  const [formState, setFormState] = useState<OperatorPayload>(defaultFormState);
+
   useEffect(() => {
-    if (data?.data) {
-      setFormState({
-        operator_name: data.data.operator_name,
-        email: data.data.email,
-        country_code: data.data.country_code || '+91',
-        phone_number: data.data.phone_number,
-        logo: data.data.logo || '',
-        gst_number: data.data.gst_number || '',
-        address: data.data.address || '',
-        is_active: data.data.is_active,
-      });
+    if (!data?.data) {
+      return;
     }
-  }, [data]);
+
+    setFormState(prev => ({
+      operator_name: data.data.operator_name,
+      email: data.data.email,
+      country_code: data.data.country_code || '+91',
+      phone_number: data.data.phone_number,
+      logo: data.data.logo || '',
+      gst_number: data.data.gst_number || '',
+      address: data.data.address || '',
+      is_active: data.data.is_active,
+      buses: busesResponse?.data
+        ? busesResponse.data.map(bus => ({
+            _id: bus._id,
+            bus_name: bus.bus_name,
+            bus_number: bus.bus_number,
+            bus_type: bus.bus_type,
+            total_seats: totalSeatsToSelectValue(bus.total_seats),
+            amenities: Array.isArray(bus.amenities)
+              ? bus.amenities.join(', ')
+              : bus.amenities || '',
+            photos: bus.photos || [],
+            driver_photo: bus.driver_photo || '',
+            driving_license: bus.driving_license || '',
+          }))
+        : prev.buses || [],
+    }));
+  }, [data, busesResponse]);
 
   const onFieldChange = (
     field: keyof OperatorPayload,
@@ -107,10 +127,102 @@ export function OperatorDetails() {
     setFormState(prev => ({ ...prev, [field]: value }));
   };
 
+  const onBusFieldChange = (index: number, field: string, value: string | number) => {
+    setFormState(prev => {
+      const newBuses = [...(prev.buses || [])];
+      newBuses[index] = { ...newBuses[index], [field]: value };
+      return { ...prev, buses: newBuses };
+    });
+  };
+
+  const onBusPhotosChange = (index: number, urls: string[]) => {
+    setFormState(prev => {
+      const updatedBuses = [...(prev.buses || [])];
+      updatedBuses[index] = { ...updatedBuses[index], photos: urls };
+      return { ...prev, buses: updatedBuses };
+    });
+  };
+
+  const onBusDriverPhotoChange = (index: number, url: string) => {
+    onBusFieldChange(index, 'driver_photo', url);
+  };
+
+  const onBusDrivingLicenseChange = (index: number, url: string) => {
+    onBusFieldChange(index, 'driving_license', url);
+  };
+
+  const removeBusPhoto = (busIndex: number, photoIndex: number) => {
+    setFormState(prev => {
+      const updatedBuses = [...(prev.buses || [])];
+      const existingPhotos = [...(updatedBuses[busIndex].photos || [])];
+      existingPhotos.splice(photoIndex, 1);
+      updatedBuses[busIndex] = { ...updatedBuses[busIndex], photos: existingPhotos };
+      return { ...prev, buses: updatedBuses };
+    });
+  };
+
+  const addBus = () => {
+    setFormState(prev => ({
+      ...prev,
+      buses: [
+        ...(prev.buses || []),
+        {
+          bus_name: '',
+          bus_number: '',
+          bus_type: '',
+          total_seats: '',
+          amenities: '',
+          photos: [],
+          driver_photo: '',
+          driving_license: '',
+        },
+      ],
+    }));
+  };
+
+  const removeBus = (index: number) => {
+    setFormState(prev => ({
+      ...prev,
+      buses: prev.buses?.filter((_, i) => i !== index) || [],
+    }));
+  };
 
   const onUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!id) {
+      return;
+    }
+
+    if (!formState.buses || formState.buses.length === 0) {
+      toast({
+        title: 'Validation Error',
+        description: 'An operator must have at least one bus.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    const busesMissingDriverPhoto = formState.buses.filter(
+      bus => !bus._id && !bus.driver_photo?.trim(),
+    );
+    if (busesMissingDriverPhoto.length > 0) {
+      toast({
+        title: 'Validation Error',
+        description: 'Each new bus must have a driver photo before submitting.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    const busesMissingLicense = formState.buses.filter(
+      bus => !bus._id && !bus.driving_license?.trim(),
+    );
+    if (busesMissingLicense.length > 0) {
+      toast({
+        title: 'Validation Error',
+        description: 'Each new bus must have a driving license before submitting.',
+        variant: 'error',
+      });
       return;
     }
 
@@ -125,12 +237,25 @@ export function OperatorDetails() {
         logo: formState.logo?.trim() || undefined,
         gst_number: formState.gst_number?.trim() || undefined,
         address: formState.address?.trim() || undefined,
+        buses:
+          formState.buses?.map(bus => ({
+            ...bus,
+            total_seats: selectValueToTotalSeats(bus.total_seats),
+            amenities:
+              typeof bus.amenities === 'string'
+                ? bus.amenities.split(',').map(a => a.trim()).filter(Boolean)
+                : bus.amenities,
+            driver_photo: bus.driver_photo?.trim() || undefined,
+            driving_license: bus.driving_license?.trim() || undefined,
+          })) || [],
       };
 
       await updateOperator({
         id,
         payload,
       }).unwrap();
+
+      await Promise.all([refetchOperator(), refetchBuses()]);
 
       toast({
         variant: 'success',
@@ -212,7 +337,7 @@ export function OperatorDetails() {
                   <img
                     src={data.data.logo}
                     alt={`${data.data.operator_name} logo`}
-                    className="h-64 w-full rounded-2xl border border-slate-100 object-contain bg-slate-50 p-3"
+                    className="h-64 w-full rounded-2xl border border-slate-100 bg-slate-50 object-contain p-3"
                     loading="lazy"
                   />
                 ) : (
@@ -223,58 +348,66 @@ export function OperatorDetails() {
               </section>
 
               <section className="rounded-3xl border border-white/60 bg-white p-5 shadow-sm">
-                <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Buses Available
+                <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Bus Documents
                 </h2>
+                <p className="mb-4 text-xs text-slate-500">
+                  Driver photo and driving license for each bus
+                </p>
                 {isFetchingBuses ? (
                   <p className="text-sm text-slate-500">Loading bus documents...</p>
-                ) : busesResponse?.data?.length ? (
-                  <div className="space-y-4">
-                    {busesResponse.data.map(bus => (
-                      <div
-                        key={bus._id}
-                        className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/70 p-3"
+                ) : formState.buses?.length ? (
+                  <div className="space-y-5">
+                    {formState.buses.map((bus, index) => (
+                      <article
+                        key={bus._id || `bus-docs-${index}`}
+                        className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4"
                       >
-                        <p className="text-sm font-semibold text-slate-700">
-                          {bus.bus_name}
-                        </p>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="border-b border-slate-200 pb-2">
+                          <p className="text-sm font-semibold text-[#023047]">
+                            {bus.bus_name || `Bus #${index + 1}`}
+                          </p>
+                          {bus.bus_number ? (
+                            <p className="text-xs text-slate-500">{bus.bus_number}</p>
+                          ) : null}
+                        </div>
+                        <div className="space-y-4">
                           <div>
-                            <p className="mb-1 text-xs font-medium uppercase text-slate-500">
-                              Driver
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                              Driver Photo
                             </p>
                             {bus.driver_photo ? (
                               <img
                                 src={bus.driver_photo}
-                                alt={`${bus.bus_name} driver`}
-                                className="h-32 w-full rounded-xl border border-slate-200 bg-white object-cover"
+                                alt={`${bus.bus_name || `Bus ${index + 1}`} driver`}
+                                className="h-40 w-full rounded-xl border border-slate-200 bg-white object-cover shadow-sm"
                                 loading="lazy"
                               />
                             ) : (
-                              <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-xs text-slate-400">
-                                Not available
+                              <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-xs text-slate-400">
+                                No driver photo uploaded
                               </div>
                             )}
                           </div>
                           <div>
-                            <p className="mb-1 text-xs font-medium uppercase text-slate-500">
-                              License
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                              Driving License
                             </p>
                             {bus.driving_license ? (
                               <img
                                 src={bus.driving_license}
-                                alt={`${bus.bus_name} driving license`}
-                                className="h-32 w-full rounded-xl border border-slate-200 bg-white object-cover"
+                                alt={`${bus.bus_name || `Bus ${index + 1}`} driving license`}
+                                className="h-40 w-full rounded-xl border border-slate-200 bg-white object-cover shadow-sm"
                                 loading="lazy"
                               />
                             ) : (
-                              <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-xs text-slate-400">
-                                Not available
+                              <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-xs text-slate-400">
+                                No driving license uploaded
                               </div>
                             )}
                           </div>
                         </div>
-                      </div>
+                      </article>
                     ))}
                   </div>
                 ) : (
@@ -432,6 +565,22 @@ export function OperatorDetails() {
                     />
                   </div>
                 </div>
+
+                <OperatorBusesFormSection
+                  buses={formState.buses || []}
+                  isEditMode
+                  isLoadingBuses={isFetchingBuses}
+                  fieldControlClass={detailFieldControlClass}
+                  actionButtonBase={detailActionButtonBase}
+                  onAddBus={addBus}
+                  onRemoveBus={removeBus}
+                  onBusFieldChange={onBusFieldChange}
+                  onBusPhotosChange={onBusPhotosChange}
+                  onBusDriverPhotoChange={onBusDriverPhotoChange}
+                  onBusDrivingLicenseChange={onBusDrivingLicenseChange}
+                  removeBusPhoto={removeBusPhoto}
+                />
+
                 <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-[#f2fbff] p-4">
                   <div className="flex items-center gap-3">
                     <Switch
