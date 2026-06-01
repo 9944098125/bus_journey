@@ -41,6 +41,7 @@ temp/
 *.swo
 *~
 .idea/
+.antigravity/
 
 # Tooling caches
 .eslintcache
@@ -61,3 +62,7 @@ stats.json
 generated-cra-app
 .cra-template-rb
 template
+
+# Project planning and tracking
+planning.md
+Tasks.md
