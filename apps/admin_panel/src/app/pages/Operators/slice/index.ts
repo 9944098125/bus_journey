@@ -18,6 +18,7 @@ import type {
   OperatorPayload,
   OperatorSingleResponse,
 } from 'types/operator';
+import { api as busesApi } from 'app/pages/Buses/slice';
 import { operatorsInitialState, selectEditingOperator } from './selectors';
 
 const operatorsSlice = createSlice({
@@ -86,6 +87,16 @@ export const operatorsApi = createApi({
       }),
       transformResponse: transformItemResponse,
       invalidatesTags: [{ type: 'Operators', id: 'LIST' }],
+      // Operators are created together with their buses; refresh the buses
+      // list (sidebar count, Buses page) which lives in a separate API slice.
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(busesApi.util.invalidateTags([{ type: 'Buses', id: 'LIST' }]));
+        } catch {
+          // Mutation failed; nothing to invalidate.
+        }
+      },
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -102,8 +113,16 @@ export const operatorsApi = createApi({
       invalidatesTags: (_result, _error, { id }) => [
         { type: 'Operators', id: 'LIST' },
         { type: 'Operator', id },
-        { type: 'Buses', id: 'LIST' },
       ],
+      // Operator edits may add/remove buses; keep the buses list in sync.
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(busesApi.util.invalidateTags([{ type: 'Buses', id: 'LIST' }]));
+        } catch {
+          // Mutation failed; nothing to invalidate.
+        }
+      },
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -117,6 +136,15 @@ export const operatorsApi = createApi({
         { type: 'Operators', id: 'LIST' },
         { type: 'Operator', id },
       ],
+      // Deleting an operator also removes its buses; refresh the buses list.
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(busesApi.util.invalidateTags([{ type: 'Buses', id: 'LIST' }]));
+        } catch {
+          // Mutation failed; nothing to invalidate.
+        }
+      },
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },

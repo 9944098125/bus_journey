@@ -16,6 +16,7 @@ import { cn } from 'utils/twm';
 
 import { useBusesSlice, useGetBusesQuery } from 'app/pages/Buses/slice';
 import { useOperatorsSlice, useGetOperatorsQuery } from 'app/pages/Operators/slice';
+import { useRoutesSlice, useGetRoutesQuery } from 'app/pages/Routes/slice';
 
 import SidebarGroup from './sidebar-group';
 import SidebarProfile from './sidebar-profile';
@@ -55,22 +56,40 @@ function SidebarPanel({
 
   useBusesSlice();
   useOperatorsSlice();
+  useRoutesSlice();
   const { data: busesResponse } = useGetBusesQuery({ limit: 1 });
   const { data: operatorsResponse } = useGetOperatorsQuery(undefined);
+  const { data: routesResponse } = useGetRoutesQuery({ limit: 1 });
 
   const totalBuses = busesResponse?.total;
-  const totalOperators = operatorsResponse?.data?.length || (operatorsResponse as any)?.total;
+  const totalOperators =
+    operatorsResponse?.total ?? operatorsResponse?.data?.length;
+  const totalRoutes = routesResponse?.total;
 
   const dynamicGroups = useMemo(() => {
     return sidebarNavGroups.map(group => ({
       ...group,
       items: group.items.map(item => {
-        if (item.id === 'buses') return { ...item, badge: totalBuses !== undefined ? totalBuses : undefined };
-        if (item.id === 'operators') return { ...item, badge: totalOperators !== undefined ? totalOperators : undefined };
+        if (item.id === 'buses')
+          return {
+            ...item,
+            badge: totalBuses !== undefined ? totalBuses : undefined,
+          };
+        if (item.id === 'operators')
+          return {
+            ...item,
+            badge:
+              totalOperators !== undefined ? totalOperators : undefined,
+          };
+        if (item.id === 'routes')
+          return {
+            ...item,
+            badge: totalRoutes !== undefined ? totalRoutes : undefined,
+          };
         return item;
-      })
+      }),
     }));
-  }, [totalBuses, totalOperators]);
+  }, [totalBuses, totalOperators, totalRoutes]);
 
   const filteredGroups = useSidebarFilter(searchQuery, dynamicGroups);
 

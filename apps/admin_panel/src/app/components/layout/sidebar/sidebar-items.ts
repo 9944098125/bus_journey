@@ -79,7 +79,6 @@ export const sidebarNavGroups: SidebarNavGroup[] = [
         title: 'Buses',
         href: '/buses',
         icon: Bus,
-        badge: 12,
         keywords: ['fleet', 'vehicles'],
       },
       {
