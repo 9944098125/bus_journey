@@ -11,7 +11,9 @@ import {
   EMPTY_FORM,
   FormStop,
   RouteFormState,
+  decimalHoursToMinutes,
   makeEmptyStop,
+  minutesToDecimalHours,
 } from './route-utils';
 
 interface UseRouteFormArgs {
@@ -39,7 +41,7 @@ export function useRouteForm({ editingRoute, open, onClose }: UseRouteFormArgs) 
         destination_city: editingRoute.destination_city,
         destination_state: editingRoute.destination_state ?? '',
         distance_km: String(editingRoute.distance_km),
-        estimated_duration_minutes: String(
+        estimated_duration: minutesToDecimalHours(
           editingRoute.estimated_duration_minutes,
         ),
         base_fare: String(editingRoute.base_fare),
@@ -54,7 +56,9 @@ export function useRouteForm({ editingRoute, open, onClose }: UseRouteFormArgs) 
             landmark: stop.landmark ?? '',
             stop_type: stop.stop_type,
             distance_from_source_km: String(stop.distance_from_source_km ?? ''),
-            arrival_offset_minutes: String(stop.arrival_offset_minutes ?? ''),
+            arrival_offset: minutesToDecimalHours(
+              stop.arrival_offset_minutes ?? 0,
+            ),
           })),
       });
     } else {
@@ -116,7 +120,8 @@ export function useRouteForm({ editingRoute, open, onClose }: UseRouteFormArgs) 
         stop_type: stop.stop_type,
         sequence: index + 1,
         distance_from_source_km: Number(stop.distance_from_source_km) || 0,
-        arrival_offset_minutes: Number(stop.arrival_offset_minutes) || 0,
+        arrival_offset_minutes:
+          decimalHoursToMinutes(stop.arrival_offset) || 0,
       }));
 
     const payload: CreateRouteMutationArg = {
@@ -127,7 +132,7 @@ export function useRouteForm({ editingRoute, open, onClose }: UseRouteFormArgs) 
       destination_state: formData.destination_state.trim() || undefined,
       distance_km: Number(formData.distance_km) || 0,
       estimated_duration_minutes:
-        Number(formData.estimated_duration_minutes) || 0,
+        decimalHoursToMinutes(formData.estimated_duration) || 0,
       base_fare: Number(formData.base_fare) || 0,
       is_active: formData.is_active,
       stops,

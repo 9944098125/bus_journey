@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 
-export type RouteStopType = "boarding" | "dropping" | "both";
+export type RouteStopType = "boarding" | "dropping" | "both" | "break";
 
 export interface IRouteStop {
   stop_name: string;

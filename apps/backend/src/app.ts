@@ -13,6 +13,8 @@ import busesRoutes from "./routes/bus.route.js";
 
 import routesRoutes from "./routes/route.route.js";
 
+import journeysRoutes from "./routes/journey.route.js";
+
 import { sendError } from "./utils/api-response.js";
 
 const app: Application = express();
@@ -92,6 +94,8 @@ app.use("/api/operators", operatorsRoutes);
 app.use("/api/buses", busesRoutes);
 
 app.use("/api/routes", routesRoutes);
+
+app.use("/api/journeys", journeysRoutes);
 
 app.use("/api/admin/dashboard", adminDashboardRoutes);
 

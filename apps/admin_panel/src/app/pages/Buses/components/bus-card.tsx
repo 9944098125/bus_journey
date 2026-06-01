@@ -26,16 +26,17 @@ export function BusCard({
         images={bus.photos ?? []}
         busName={bus.bus_name}
         isActive={bus.is_active}
+        heightClass="h-64"
         onImageClick={() => bus.photos?.length && onImageClick(bus.photos)}
       />
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-6">
         <h3
-          className="truncate text-lg font-bold text-slate-900"
+          className="line-clamp-2 min-h-[3.75rem] break-words text-xl font-bold leading-snug text-slate-900"
           title={bus.bus_name}
         >
           {bus.bus_name}
         </h3>
-        <p className="mt-0.5 inline-flex w-fit items-center rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-medium text-slate-600">
+        <p className="mt-1 inline-flex w-fit items-center rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-medium text-slate-600">
           {bus.bus_number}
         </p>
         <div className="mt-4 flex items-center gap-2 pt-1">

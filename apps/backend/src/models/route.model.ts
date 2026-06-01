@@ -23,7 +23,7 @@ const routeStopSchema = new Schema<IRouteStop>(
 
     stop_type: {
       type: String,
-      enum: ["boarding", "dropping", "both"],
+      enum: ["boarding", "dropping", "both", "break"],
       default: "both",
     },
 

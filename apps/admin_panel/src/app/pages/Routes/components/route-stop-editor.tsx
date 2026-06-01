@@ -10,6 +10,7 @@ import {
   SelectTrigger,
 } from '../../../components/ui/select';
 import { RouteStopType } from '../slice/types';
+import { DecimalHoursInput } from './decimal-hours-input';
 import { FormStop } from './route-utils';
 
 interface RouteStopEditorProps {
@@ -38,6 +39,11 @@ const STOP_TYPE_OPTIONS: {
     value: 'both',
     label: 'Both',
     description: 'Passengers can get on and off here',
+  },
+  {
+    value: 'break',
+    label: 'Break',
+    description: 'Scheduled rest stop — no boarding or dropping',
   },
 ];
 
@@ -156,7 +162,8 @@ export function RouteStopEditor({
             </SelectContent>
           </Select>
           <FieldHint>
-            Controls whether passengers can board, drop, or both at this stop.
+            Boarding, dropping, both, or a break stop with no passenger
+            activity.
           </FieldHint>
         </div>
 
@@ -178,23 +185,18 @@ export function RouteStopEditor({
           <FieldHint>Kilometres travelled from the first stop.</FieldHint>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor={fieldId('offset')}>Arrival offset (min)</Label>
-          <Input
-            id={fieldId('offset')}
-            type="number"
-            min={0}
-            inputMode="numeric"
-            value={stop.arrival_offset_minutes}
-            onChange={e =>
-              onChange(stop.id, {
-                arrival_offset_minutes: e.target.value,
-              })
-            }
-            placeholder="e.g. 195"
-          />
-          <FieldHint>Minutes after departure from the source city.</FieldHint>
-        </div>
+        <DecimalHoursInput
+          id={fieldId('offset')}
+          label="Arrival offset (hours)"
+          value={stop.arrival_offset}
+          onChange={value => onChange(stop.id, { arrival_offset: value })}
+          hint={
+            <FieldHint>
+              Hours after leaving the source. Decimals are minutes — 3.25 is 3
+              hours 15 minutes.
+            </FieldHint>
+          }
+        />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-export type RouteStopType = 'boarding' | 'dropping' | 'both';
+export type RouteStopType = 'boarding' | 'dropping' | 'both' | 'break';
 
 /** A single stop embedded in a route. Backend stops have no `_id`. */
 export interface RouteStop {

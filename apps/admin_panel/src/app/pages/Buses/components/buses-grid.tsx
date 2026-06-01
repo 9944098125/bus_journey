@@ -30,9 +30,10 @@ export function BusesGrid({
             key={i}
             className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
           >
-            <Skeleton className="h-48 w-full rounded-none" />
-            <div className="space-y-3 p-5">
-              <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-64 w-full rounded-none" />
+            <div className="space-y-3 p-6">
+              <Skeleton className="h-7 w-4/5" />
+              <Skeleton className="h-5 w-2/3" />
               <Skeleton className="h-4 w-1/2" />
               <div className="flex gap-2 pt-2">
                 <Skeleton className="h-11 flex-1 rounded-xl" />

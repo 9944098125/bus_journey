@@ -7,7 +7,7 @@ const ROUTE_NOT_FOUND = "Route not found";
 const INVALID_ROUTE_ID = "Invalid route id";
 const ROUTE_CODE_EXISTS = "Route code already exists";
 
-const VALID_STOP_TYPES = new Set(["boarding", "dropping", "both"]);
+const VALID_STOP_TYPES = new Set(["boarding", "dropping", "both", "break"]);
 
 const IMMUTABLE_UPDATE_KEYS = new Set([
   "_id",

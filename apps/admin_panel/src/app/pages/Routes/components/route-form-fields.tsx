@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '../../../components/ui/input';
 import Label from '../../../components/ui/label';
 import { Switch } from '../../../components/ui/switch';
+import { DecimalHoursInput } from './decimal-hours-input';
 import { RouteFormState } from './route-utils';
 
 interface RouteFormFieldsProps {
@@ -104,22 +105,20 @@ export function RouteFormFields({
             placeholder="575"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="duration">Duration (min)</Label>
-          <Input
-            id="duration"
-            type="number"
-            min={0}
-            value={formData.estimated_duration_minutes}
-            onChange={e =>
-              setFormData({
-                ...formData,
-                estimated_duration_minutes: e.target.value,
-              })
-            }
-            placeholder="540"
-          />
-        </div>
+        <DecimalHoursInput
+          id="duration"
+          label="Duration (hours)"
+          value={formData.estimated_duration}
+          onChange={value =>
+            setFormData({ ...formData, estimated_duration: value })
+          }
+          hint={
+            <p className="text-xs text-slate-400">
+              Total travel time in hours. Use a decimal for minutes — 9.5 is 9
+              hours 30 minutes.
+            </p>
+          }
+        />
         <div className="space-y-2">
           <Label htmlFor="base_fare">Base Fare (₹)</Label>
           <Input

@@ -2,7 +2,12 @@ import React from 'react';
 import { Clock, MapPin, Navigation } from 'lucide-react';
 
 import { RouteStop } from '../slice/types';
-import { STOP_TYPE_DOT, STOP_TYPE_STYLES, formatDuration } from './route-utils';
+import {
+  STOP_TYPE_DOT,
+  STOP_TYPE_STYLES,
+  formatDuration,
+  formatStopTypeLabel,
+} from './route-utils';
 
 export function StopsTimeline({ stops }: { stops: RouteStop[] }) {
   const ordered = stops.slice().sort((a, b) => a.sequence - b.sequence);
@@ -35,11 +40,11 @@ export function StopsTimeline({ stops }: { stops: RouteStop[] }) {
               </span>
               <span className="text-sm text-slate-500">· {stop.city}</span>
               <span
-                className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ring-1 ${
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${
                   STOP_TYPE_STYLES[stop.stop_type]
                 }`}
               >
-                {stop.stop_type}
+                {formatStopTypeLabel(stop.stop_type)}
               </span>
             </div>
             {stop.landmark && (
@@ -51,8 +56,8 @@ export function StopsTimeline({ stops }: { stops: RouteStop[] }) {
                 {stop.distance_from_source_km} km from source
               </span>
               <span className="inline-flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" /> +
-                {formatDuration(stop.arrival_offset_minutes)}
+                <Clock className="h-3.5 w-3.5" />{' '}
+                {formatDuration(stop.arrival_offset_minutes)} from source
               </span>
             </div>
           </li>
