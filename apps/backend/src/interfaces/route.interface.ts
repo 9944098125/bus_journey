@@ -23,7 +23,6 @@ export interface IRoute extends Document {
   estimated_duration_minutes: number;
   base_fare: number;
   stops: IRouteStop[];
-  operator?: Types.ObjectId;
   is_active: boolean;
   created_by: Types.ObjectId;
   createdAt: Date;
@@ -34,7 +33,6 @@ export interface IRouteQuery {
   page?: number;
   limit?: number;
   search?: string;
-  operator?: string;
   source_city?: string;
   destination_city?: string;
   is_active?: boolean;

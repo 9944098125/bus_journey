@@ -1,6 +1,7 @@
 import { Buses } from "../models/bus.model.js";
 import type { IBus } from "../interfaces/bus.interface.js";
-import mongoose from "mongoose";
+
+const OPERATOR_POPULATE = "operator_name email phone_number logo";
 
 class BusRepository {
   async createBus(busData: Partial<IBus>): Promise<IBus> {
@@ -15,7 +16,7 @@ class BusRepository {
   ): Promise<{ data: IBus[]; total: number }> {
     const [data, total] = await Promise.all([
       Buses.find(query)
-        .populate("operator", "operator_name email phone_number logo")
+        .populate("operator", OPERATOR_POPULATE)
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
@@ -28,7 +29,7 @@ class BusRepository {
 
   async getBusById(id: string): Promise<IBus | null> {
     return await Buses.findById(id)
-      .populate("operator", "operator_name email phone_number logo")
+      .populate("operator", OPERATOR_POPULATE)
       .lean();
   }
 

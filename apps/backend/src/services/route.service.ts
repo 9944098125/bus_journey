@@ -2,12 +2,10 @@ import mongoose from "mongoose";
 
 import type { IRoute, IRouteStop } from "../interfaces/route.interface.js";
 import { RouteRepository } from "../repositories/route.repository.js";
-import { OperatorRepository } from "../repositories/operator.repository.js";
 
 const ROUTE_NOT_FOUND = "Route not found";
 const INVALID_ROUTE_ID = "Invalid route id";
 const ROUTE_CODE_EXISTS = "Route code already exists";
-const OPERATOR_NOT_FOUND = "Operator not found";
 
 const VALID_STOP_TYPES = new Set(["boarding", "dropping", "both"]);
 
@@ -20,7 +18,6 @@ const IMMUTABLE_UPDATE_KEYS = new Set([
 
 export class RouteService {
   private readonly routeRepository = new RouteRepository();
-  private readonly operatorRepository = new OperatorRepository();
 
   private assertValidObjectId(id: string): void {
     if (!mongoose.isValidObjectId(id)) {
@@ -106,18 +103,6 @@ export class RouteService {
     }
   }
 
-  private async assertOperatorExists(operatorId: string): Promise<void> {
-    if (!mongoose.isValidObjectId(operatorId)) {
-      throw new Error("Invalid operator id");
-    }
-
-    const operator = await this.operatorRepository.findOperatorById(operatorId);
-
-    if (!operator) {
-      throw new Error(OPERATOR_NOT_FOUND);
-    }
-  }
-
   private toUpdatePayload(data: Partial<IRoute>): Partial<IRoute> {
     const payload: Partial<IRoute> = {};
 
@@ -140,10 +125,6 @@ export class RouteService {
 
     if (!mongoose.isValidObjectId(createdById)) {
       throw new Error("Invalid creator id");
-    }
-
-    if (data.operator) {
-      await this.assertOperatorExists(data.operator.toString());
     }
 
     let route_code = data.route_code?.trim().toUpperCase();
@@ -172,9 +153,6 @@ export class RouteService {
       estimated_duration_minutes: Number(data.estimated_duration_minutes),
       base_fare: Number(data.base_fare),
       stops: this.normalizeStops(data.stops),
-      operator: data.operator
-        ? new mongoose.Types.ObjectId(data.operator.toString())
-        : undefined,
       is_active: data.is_active ?? true,
       created_by: new mongoose.Types.ObjectId(createdById),
     });
@@ -206,7 +184,6 @@ export class RouteService {
     page: number = 1,
     limit: number = 10,
     search?: string,
-    operatorId?: string,
     source_city?: string,
     destination_city?: string,
     is_active?: boolean
@@ -221,10 +198,6 @@ export class RouteService {
         { source_city: searchRegex },
         { destination_city: searchRegex },
       ];
-    }
-
-    if (operatorId && mongoose.isValidObjectId(operatorId)) {
-      query.operator = operatorId;
     }
 
     if (source_city) {
@@ -325,13 +298,6 @@ export class RouteService {
 
     if (updatePayload.base_fare !== undefined && Number(updatePayload.base_fare) < 0) {
       throw new Error("Base fare must be a positive number");
-    }
-
-    if (updatePayload.operator !== undefined) {
-      await this.assertOperatorExists(updatePayload.operator.toString());
-      updatePayload.operator = new mongoose.Types.ObjectId(
-        updatePayload.operator.toString()
-      );
     }
 
     if (updatePayload.stops !== undefined) {

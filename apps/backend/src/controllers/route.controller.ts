@@ -19,11 +19,10 @@ const BAD_REQUEST_MESSAGES = new Set([
   "Source city cannot be empty",
   "Destination city cannot be empty",
   "Invalid route id",
-  "Invalid operator id",
   "Invalid creator id",
 ]);
 
-const NOT_FOUND_MESSAGES = new Set(["Route not found", "Operator not found"]);
+const NOT_FOUND_MESSAGES = new Set(["Route not found"]);
 
 export class RouteController {
   private readonly routeService = new RouteService();
@@ -61,7 +60,6 @@ export class RouteController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const search = req.query.search as string | undefined;
-      const operator = req.query.operator as string | undefined;
       const source_city = req.query.source_city as string | undefined;
       const destination_city = req.query.destination_city as string | undefined;
 
@@ -78,7 +76,6 @@ export class RouteController {
         page,
         limit,
         search,
-        operator,
         source_city,
         destination_city,
         is_active

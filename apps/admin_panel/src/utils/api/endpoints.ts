@@ -91,6 +91,7 @@ export const transformUploadResponse = (response: any) => {
 export const HTTP_METHODS = {
   GET: 'GET',
   POST: 'POST',
+  PUT: 'PUT',
   PATCH: 'PATCH',
   DELETE: 'DELETE',
 };
@@ -194,6 +195,28 @@ export const endpoints = {
     }),
     delete: (id: string) => ({
       url: `/buses/${id}`,
+      method: HTTP_METHODS.DELETE,
+    }),
+  },
+  routes: {
+    list: {
+      url: '/routes',
+      method: HTTP_METHODS.GET,
+    },
+    create: {
+      url: '/routes',
+      method: HTTP_METHODS.POST,
+    },
+    byId: (id: string) => ({
+      url: `/routes/${id}`,
+      method: HTTP_METHODS.GET,
+    }),
+    update: (id: string) => ({
+      url: `/routes/${id}`,
+      method: HTTP_METHODS.PATCH,
+    }),
+    delete: (id: string) => ({
+      url: `/routes/${id}`,
       method: HTTP_METHODS.DELETE,
     }),
   },

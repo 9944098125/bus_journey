@@ -2,7 +2,6 @@ import { Routes } from "../models/route.model.js";
 
 import type { IRoute } from "../interfaces/route.interface.js";
 
-const OPERATOR_POPULATE = "operator_name email phone_number logo";
 const CREATED_BY_POPULATE = "full_name email role";
 
 export class RouteRepository {
@@ -11,9 +10,7 @@ export class RouteRepository {
   }
 
   public async findRouteById(id: string) {
-    return Routes.findById(id)
-      .populate("operator", OPERATOR_POPULATE)
-      .populate("created_by", CREATED_BY_POPULATE);
+    return Routes.findById(id).populate("created_by", CREATED_BY_POPULATE);
   }
 
   public async findRouteByCode(route_code: string) {
@@ -24,9 +21,7 @@ export class RouteRepository {
     return Routes.findByIdAndUpdate(id, data, {
       new: true,
       runValidators: true,
-    })
-      .populate("operator", OPERATOR_POPULATE)
-      .populate("created_by", CREATED_BY_POPULATE);
+    }).populate("created_by", CREATED_BY_POPULATE);
   }
 
   public async deleteRoute(id: string) {
@@ -40,7 +35,6 @@ export class RouteRepository {
   ): Promise<{ data: IRoute[]; total: number }> {
     const [data, total] = await Promise.all([
       Routes.find(query)
-        .populate("operator", OPERATOR_POPULATE)
         .populate("created_by", CREATED_BY_POPULATE)
         .skip(skip)
         .limit(limit)

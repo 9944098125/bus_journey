@@ -111,11 +111,6 @@ const routesSchema = new Schema<IRoute>(
       default: [],
     },
 
-    operator: {
-      type: Schema.Types.ObjectId,
-      ref: "Operators",
-    },
-
     is_active: {
       type: Boolean,
       default: true,
