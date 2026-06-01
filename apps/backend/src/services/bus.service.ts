@@ -41,8 +41,8 @@ export class BusService {
       throw new Error("Bus type is required");
     }
 
-    if (data.total_seats === undefined || data.total_seats < 1) {
-      throw new Error("Total seats must be at least 1");
+    if (!data.total_seats?.trim()) {
+      throw new Error("Total seats is required");
     }
 
     if (!data.operator || !mongoose.isValidObjectId(data.operator.toString())) {
@@ -94,7 +94,7 @@ export class BusService {
       bus_name: data.bus_name!.trim(),
       bus_number,
       bus_type: data.bus_type!.trim(),
-      total_seats: data.total_seats,
+      total_seats: data.total_seats!.trim(),
       operator: data.operator,
       amenities: data.amenities || [],
       driver_photo: data.driver_photo?.trim() || undefined,
@@ -165,10 +165,7 @@ export class BusService {
     }
 
     if (seats) {
-      if (seats === "25 seats") query.total_seats = 25;
-      else if (seats === "50 seats") query.total_seats = 50;
-      else if (seats === "15 bearths up & down") query.total_seats = 30;
-      else if (seats === "25 bearths up & down") query.total_seats = 50;
+      query.total_seats = seats;
     }
 
     const skip = (page - 1) * limit;
@@ -228,9 +225,10 @@ export class BusService {
     }
 
     if (updatePayload.total_seats !== undefined) {
-      if (updatePayload.total_seats < 1) {
-        throw new Error("Total seats must be at least 1");
+      if (!updatePayload.total_seats.trim()) {
+        throw new Error("Total seats cannot be empty");
       }
+      updatePayload.total_seats = updatePayload.total_seats.trim();
     }
 
     if (updatePayload.operator !== undefined) {

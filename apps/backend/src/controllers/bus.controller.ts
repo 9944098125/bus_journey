@@ -1,5 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
 import { BusService } from "../services/bus.service.js";
+import { sendError, sendItem, sendList } from "../utils/api-response.js";
+
+const NOT_FOUND_MESSAGES = new Set(["Bus not found", "Invalid bus id"]);
+const BAD_REQUEST_MESSAGES = new Set([
+  "Bus number already exists",
+  "Operator not found",
+]);
 
 export class BusController {
   private readonly busService = new BusService();
@@ -9,32 +16,22 @@ export class BusController {
       const user = req.user;
 
       if (!user) {
-        res.status(401).json({ success: false, message: "Unauthorized" });
+        sendError(req, res, 401, "Unauthorized");
         return;
       }
 
       const bus = await this.busService.createBus(req.body, user._id.toString());
 
-      res.status(201).json({
-        success: true,
-        message: "Bus created successfully",
-        data: bus,
-      });
+      sendItem(req, res, "Bus created successfully", bus, 201);
     } catch (error: any) {
       console.error("Error creating bus:", error);
 
-      if (
-        error.message === "Bus number already exists" ||
-        error.message === "Operator not found"
-      ) {
-        res.status(400).json({ success: false, message: error.message });
+      if (BAD_REQUEST_MESSAGES.has(error.message)) {
+        sendError(req, res, 400, error.message);
         return;
       }
 
-      res.status(500).json({
-        success: false,
-        message: error.message || "Internal server error",
-      });
+      sendError(req, res, 500, error.message || "Internal server error");
     }
   };
 
@@ -46,7 +43,7 @@ export class BusController {
       const operator = req.query.operator as string;
       const seats = req.query.seats as string;
       const bus_type = req.query.bus_type as string;
-      
+
       let is_active: boolean | undefined = undefined;
       if (req.query.is_active !== undefined) {
         is_active = req.query.is_active === "true";
@@ -62,20 +59,15 @@ export class BusController {
         bus_type
       );
 
-      res.status(200).json({
-        success: true,
-        data: result.data,
-        total: result.total,
-        page,
-        limit,
-        totalPages: Math.ceil(result.total / limit),
+      sendList(req, res, "Buses fetched successfully", {
+        pageNumber: page,
+        pageSize: limit,
+        totalDocuments: result.total,
+        documents: result.data,
       });
     } catch (error: any) {
       console.error("Error fetching buses:", error);
-      res.status(500).json({
-        success: false,
-        message: error.message || "Internal server error",
-      });
+      sendError(req, res, 500, error.message || "Internal server error");
     }
   };
 
@@ -83,25 +75,16 @@ export class BusController {
     try {
       const bus = await this.busService.getBusById(req.params.id as string);
 
-      res.status(200).json({
-        success: true,
-        data: bus,
-      });
+      sendItem(req, res, "Bus fetched successfully", bus);
     } catch (error: any) {
       console.error("Error fetching bus by id:", error);
 
-      if (
-        error.message === "Bus not found" ||
-        error.message === "Invalid bus id"
-      ) {
-        res.status(404).json({ success: false, message: error.message });
+      if (NOT_FOUND_MESSAGES.has(error.message)) {
+        sendError(req, res, 404, error.message);
         return;
       }
 
-      res.status(500).json({
-        success: false,
-        message: error.message || "Internal server error",
-      });
+      sendError(req, res, 500, error.message || "Internal server error");
     }
   };
 
@@ -109,31 +92,21 @@ export class BusController {
     try {
       const bus = await this.busService.updateBus(req.params.id as string, req.body);
 
-      res.status(200).json({
-        success: true,
-        message: "Bus updated successfully",
-        data: bus,
-      });
+      sendItem(req, res, "Bus updated successfully", bus);
     } catch (error: any) {
       console.error("Error updating bus:", error);
 
-      if (
-        error.message === "Bus not found" ||
-        error.message === "Invalid bus id"
-      ) {
-        res.status(404).json({ success: false, message: error.message });
+      if (NOT_FOUND_MESSAGES.has(error.message)) {
+        sendError(req, res, 404, error.message);
         return;
       }
 
       if (error.message === "Bus number already exists") {
-        res.status(400).json({ success: false, message: error.message });
+        sendError(req, res, 400, error.message);
         return;
       }
 
-      res.status(500).json({
-        success: false,
-        message: error.message || "Internal server error",
-      });
+      sendError(req, res, 500, error.message || "Internal server error");
     }
   };
 
@@ -141,25 +114,16 @@ export class BusController {
     try {
       await this.busService.deleteBus(req.params.id as string);
 
-      res.status(200).json({
-        success: true,
-        message: "Bus deleted successfully",
-      });
+      sendItem(req, res, "Bus deleted successfully", null);
     } catch (error: any) {
       console.error("Error deleting bus:", error);
 
-      if (
-        error.message === "Bus not found" ||
-        error.message === "Invalid bus id"
-      ) {
-        res.status(404).json({ success: false, message: error.message });
+      if (NOT_FOUND_MESSAGES.has(error.message)) {
+        sendError(req, res, 404, error.message);
         return;
       }
 
-      res.status(500).json({
-        success: false,
-        message: error.message || "Internal server error",
-      });
+      sendError(req, res, 500, error.message || "Internal server error");
     }
   };
 
@@ -170,26 +134,17 @@ export class BusController {
   ): Promise<void> {
     try {
       if (!req.file) {
-        res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
+        sendError(req, res, 400, "No file uploaded");
         return;
       }
 
       const uploadedImage = await this.busService.uploadDriverPhoto(
         req.file.buffer
       );
-      const imageUrl = uploadedImage.secure_url;
 
-      res.status(200).json({
-        success: true,
-        message: "Driver photo uploaded successfully",
-        imageUrl,
-        data: {
-          imageUrl,
-          publicId: uploadedImage.public_id,
-        },
+      sendItem(req, res, "Driver photo uploaded successfully", {
+        imageUrl: uploadedImage.secure_url,
+        publicId: uploadedImage.public_id,
       });
     } catch (error) {
       next(error);
@@ -203,26 +158,17 @@ export class BusController {
   ): Promise<void> {
     try {
       if (!req.file) {
-        res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
+        sendError(req, res, 400, "No file uploaded");
         return;
       }
 
       const uploadedImage = await this.busService.uploadDrivingLicense(
         req.file.buffer
       );
-      const imageUrl = uploadedImage.secure_url;
 
-      res.status(200).json({
-        success: true,
-        message: "Driving license uploaded successfully",
-        imageUrl,
-        data: {
-          imageUrl,
-          publicId: uploadedImage.public_id,
-        },
+      sendItem(req, res, "Driving license uploaded successfully", {
+        imageUrl: uploadedImage.secure_url,
+        publicId: uploadedImage.public_id,
       });
     } catch (error) {
       next(error);
@@ -236,26 +182,17 @@ export class BusController {
   ): Promise<void> {
     try {
       if (!req.file) {
-        res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
+        sendError(req, res, 400, "No file uploaded");
         return;
       }
 
       const uploadedImage = await this.busService.uploadBusPhoto(
         req.file.buffer
       );
-      const imageUrl = uploadedImage.secure_url;
 
-      res.status(200).json({
-        success: true,
-        message: "Bus photo uploaded successfully",
-        imageUrl,
-        data: {
-          imageUrl,
-          publicId: uploadedImage.public_id,
-        },
+      sendItem(req, res, "Bus photo uploaded successfully", {
+        imageUrl: uploadedImage.secure_url,
+        publicId: uploadedImage.public_id,
       });
     } catch (error) {
       next(error);

@@ -5,11 +5,12 @@ export interface Bus {
   bus_name: string;
   bus_number: string;
   bus_type: string;
-  total_seats: number;
+  total_seats: string;
   operator: Operator;
   amenities: string[];
   driver_photo?: string;
   driving_license?: string;
+  photos?: string[];
   is_active: boolean;
   created_by: string;
   createdAt: string;
@@ -43,7 +44,7 @@ export interface CreateBusMutationArg {
   bus_name: string;
   bus_number: string;
   bus_type: string;
-  total_seats: number;
+  total_seats: string;
   operator: string; // Operator ID
   amenities?: string[];
   driver_photo?: string;

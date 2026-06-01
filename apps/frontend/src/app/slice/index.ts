@@ -3,7 +3,12 @@ import { createSlice } from 'utils/@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/redux-injectors';
 import { GlobalState } from './types';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { endpoints, formatErrors, baseQuery } from 'utils/api/endpoints';
+import {
+  endpoints,
+  formatErrors,
+  baseQuery,
+  transformAuthResponse,
+} from 'utils/api/endpoints';
 import type { AuthUser, LoginMutationArg, LoginResponse } from 'types/user';
 import {
   clearAuthStorage,
@@ -67,6 +72,7 @@ export const api = createApi({
         ...endpoints.login,
         body: credentials,
       }),
+      transformResponse: transformAuthResponse,
       async onQueryStarted({ rememberMe }, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -90,6 +96,7 @@ export const api = createApi({
         url: `${endpoints.verifyFirstLogin.url}?token=${encodeURIComponent(token)}`,
         method: endpoints.verifyFirstLogin.method,
       }),
+      transformResponse: transformAuthResponse,
       async onQueryStarted(_token, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;

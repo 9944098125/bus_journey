@@ -2,7 +2,14 @@ import { createSlice } from 'utils/@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/redux-injectors';
 import { BusesState, GetBusesQueryArg, GetBusesResponse, CreateBusMutationArg, UpdateBusMutationArg, Bus } from './types';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { endpoints, formatErrors, baseQuery } from 'utils/api/endpoints';
+import {
+  endpoints,
+  formatErrors,
+  baseQuery,
+  transformItemResponse,
+  transformListResponse,
+  transformUploadResponse,
+} from 'utils/api/endpoints';
 
 export const initialState: BusesState = {};
 
@@ -35,6 +42,7 @@ export const api = createApi({
           method: endpoints.buses.list.method,
         };
       },
+      transformResponse: transformListResponse,
       providesTags: (result) =>
         result
           ? [
@@ -47,6 +55,7 @@ export const api = createApi({
 
     getBusById: build.query<{ success: boolean; data: Bus }, string>({
       query: id => endpoints.buses.byId(id),
+      transformResponse: transformItemResponse,
       providesTags: (result, error, id) => [{ type: 'Bus', id }],
       transformErrorResponse: formatErrors,
     }),
@@ -56,6 +65,7 @@ export const api = createApi({
         ...endpoints.buses.create,
         body,
       }),
+      transformResponse: transformItemResponse,
       invalidatesTags: [{ type: 'Buses', id: 'LIST' }],
       transformErrorResponse: formatErrors,
     }),
@@ -65,6 +75,7 @@ export const api = createApi({
         ...endpoints.buses.update(id),
         body,
       }),
+      transformResponse: transformItemResponse,
       invalidatesTags: (result, error, { id }) => [
         { type: 'Bus', id },
         { type: 'Buses', id: 'LIST' },
@@ -74,6 +85,7 @@ export const api = createApi({
 
     deleteBus: build.mutation<{ success: boolean; message: string }, string>({
       query: id => endpoints.buses.delete(id),
+      transformResponse: transformItemResponse,
       invalidatesTags: [{ type: 'Buses', id: 'LIST' }],
       transformErrorResponse: formatErrors,
     }),
@@ -94,18 +106,7 @@ export const api = createApi({
           },
         };
       },
-      transformResponse(response: any) {
-        const imageUrl = response.imageUrl ?? response.data?.imageUrl;
-
-        if (!imageUrl) {
-          throw new Error('Upload succeeded but no image URL was returned');
-        }
-
-        return {
-          imageUrl,
-          publicId: response.data?.publicId ?? '',
-        };
-      },
+      transformResponse: transformUploadResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -127,18 +128,7 @@ export const api = createApi({
           },
         };
       },
-      transformResponse(response: any) {
-        const imageUrl = response.imageUrl ?? response.data?.imageUrl;
-
-        if (!imageUrl) {
-          throw new Error('Upload succeeded but no image URL was returned');
-        }
-
-        return {
-          imageUrl,
-          publicId: response.data?.publicId ?? '',
-        };
-      },
+      transformResponse: transformUploadResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -160,18 +150,7 @@ export const api = createApi({
           },
         };
       },
-      transformResponse(response: any) {
-        const imageUrl = response.imageUrl ?? response.data?.imageUrl;
-
-        if (!imageUrl) {
-          throw new Error('Upload succeeded but no image URL was returned');
-        }
-
-        return {
-          imageUrl,
-          publicId: response.data?.publicId ?? '',
-        };
-      },
+      transformResponse: transformUploadResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },

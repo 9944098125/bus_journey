@@ -43,7 +43,7 @@ export type OperatorBusPayload = {
   bus_name: string;
   bus_number: string;
   bus_type: string;
-  total_seats: number | string;
+  total_seats: string;
   amenities: string;
   photos?: string[];
   driver_photo?: string;

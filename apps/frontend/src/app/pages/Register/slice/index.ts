@@ -1,7 +1,12 @@
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/redux-injectors';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { endpoints, formatErrors, baseQuery } from 'utils/api/endpoints';
+import {
+  endpoints,
+  formatErrors,
+  baseQuery,
+  transformUploadResponse,
+} from 'utils/api/endpoints';
 
 import type { UploadProfilePictureResponse } from 'types/user';
 
@@ -45,18 +50,7 @@ export const registerApi = createApi({
           },
         };
       },
-      transformResponse(response: UploadProfilePictureResponse) {
-        const imageUrl = response.imageUrl ?? response.data?.imageUrl;
-
-        if (!imageUrl) {
-          throw new Error('Upload succeeded but no image URL was returned');
-        }
-
-        return {
-          imageUrl,
-          publicId: response.data?.publicId ?? '',
-        };
-      },
+      transformResponse: transformUploadResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },

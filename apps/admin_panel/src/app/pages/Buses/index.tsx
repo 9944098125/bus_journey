@@ -17,7 +17,9 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import Label from '../../components/ui/label';
 import { useToast } from '../../components/ui/use-toast';
-import { Plus, Pencil, Trash2, Filter, ImagePlus, UploadCloud, FileBadge2, Loader2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Filter, ImagePlus, UploadCloud, FileBadge2, Loader2, X, ChevronLeft, ChevronRight, Eye, Users, Tag, Building2, CheckCircle2, CircleSlash, ImageOff, BadgeCheck } from 'lucide-react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { cn } from 'utils/twm';
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import {
@@ -28,6 +30,7 @@ import {
 } from '../../components/ui/sheet';
 import { ConfirmationDialog } from '../../components/ui/confirmation-dialog';
 import useDebounce from 'utils/hooks/debounce-hook';
+import { totalSeatsToSelectValue } from 'utils/busSeats';
 
 const actionButtonBase =
   'h-12 rounded-xl px-5 text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2';
@@ -94,7 +97,7 @@ export function Buses() {
     bus_name: string;
     bus_number: string;
     bus_type: string;
-    total_seats: string | number;
+    total_seats: string;
     operator: string;
     amenities: string;
     driver_photo: string;
@@ -104,7 +107,7 @@ export function Buses() {
     bus_name: '',
     bus_number: '',
     bus_type: '',
-    total_seats: '40',
+    total_seats: '25 seats',
     operator: '',
     amenities: '',
     driver_photo: '',
@@ -125,40 +128,24 @@ export function Buses() {
     openLightbox([imageUrl]);
   };
 
-  const formatSeatsForTable = (value: string | number) => {
-    if (typeof value === 'string') {
-      return value;
-    }
-
-    if (value === 30) {
-      return '15 bearths up & down';
-    }
-
-    return value;
-  };
-
   const [selectedDriverPhotoName, setSelectedDriverPhotoName] = useState('');
   const [driverPhotoUploadError, setDriverPhotoUploadError] = useState('');
   const [selectedLicenseName, setSelectedLicenseName] = useState('');
   const [licenseUploadError, setLicenseUploadError] = useState('');
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [detailsBus, setDetailsBus] = useState<Bus | null>(null);
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   const handleOpenSheet = (bus?: Bus) => {
     if (bus) {
       setEditingBus(bus);
-      
-      let seatsStr = bus.total_seats.toString();
-      if (bus.total_seats === 25) seatsStr = "25 seats";
-      else if (bus.total_seats === 50) seatsStr = "50 seats";
-      else if (bus.total_seats === 30) seatsStr = "15 bearths up & down";
-      
+
       setFormData({
         bus_name: bus.bus_name,
         bus_number: bus.bus_number,
         bus_type: bus.bus_type,
-        total_seats: seatsStr,
+        total_seats: totalSeatsToSelectValue(bus.total_seats),
         operator: bus.operator?._id || bus.operator,
         amenities: bus.amenities.join(', '),
         driver_photo: bus.driver_photo || '',
@@ -171,7 +158,7 @@ export function Buses() {
         bus_name: '',
         bus_number: '',
         bus_type: '',
-        total_seats: '40',
+        total_seats: '25 seats',
         operator: '',
         amenities: '',
         driver_photo: '',
@@ -270,17 +257,9 @@ export function Buses() {
       return;
     }
 
-    let finalSeats = 40;
-    if (formData.total_seats === "25 seats") finalSeats = 25;
-    else if (formData.total_seats === "50 seats") finalSeats = 50;
-    else if (formData.total_seats === "15 bearths up & down") finalSeats = 30;
-    else if (formData.total_seats === "25 bearths up & down") finalSeats = 50;
-    else if (typeof formData.total_seats === 'number') finalSeats = formData.total_seats;
-    else finalSeats = parseInt(formData.total_seats as string) || 40;
-
     const payload = {
       ...formData,
-      total_seats: finalSeats,
+      total_seats: formData.total_seats,
       amenities: formData.amenities.split(',').map(a => a.trim()).filter(Boolean),
     };
 
@@ -440,130 +419,82 @@ export function Buses() {
           </div>
         </div>
 
-        <div className="rounded-md border bg-white overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-4 font-medium text-gray-500">Bus Name</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Number</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Type</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Seats</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Operator</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Photos</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Driver Photo</th>
-                  <th className="px-6 py-4 font-medium text-gray-500">Driving License</th>
-                  <th className="px-6 py-4 font-medium text-gray-500 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {(isLoading || isInitialLoading) ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-6 py-4"><Skeleton className="h-4 w-3/4" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-4 w-1/2" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-4 w-2/3" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-4 w-8" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-4 w-3/4" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-10 w-10 rounded-lg" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-10 w-10 rounded-lg" /></td>
-                      <td className="px-6 py-4"><Skeleton className="h-10 w-10 rounded-lg" /></td>
-                      <td className="px-6 py-4 flex justify-end gap-2">
-                        <Skeleton className="h-8 w-16 rounded-md" />
-                        <Skeleton className="h-8 w-20 rounded-md" />
-                      </td>
-                    </tr>
-                  ))
-                ) : busesResponse?.data?.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
-                      No buses found.
-                    </td>
-                  </tr>
-                ) : (
-                  busesResponse?.data.map((bus) => (
-                    <tr key={bus._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium">{bus.bus_name}</td>
-                      <td className="px-6 py-4">{bus.bus_number}</td>
-                      <td className="px-6 py-4">{bus.bus_type}</td>
-                      <td className="px-6 py-4">{formatSeatsForTable(bus.total_seats)}</td>
-                      <td className="px-6 py-4">{bus.operator?.operator_name || 'N/A'}</td>
-                      <td className="px-6 py-4">
-                        {bus.photos && bus.photos.length > 0 ? (
-                          <div 
-                            className="flex -space-x-3 cursor-pointer transition-transform hover:scale-105"
-                            title="Open images"
-                            onClick={() => openLightbox(bus.photos!)}
-                          >
-                            {bus.photos.slice(0, 3).map((photo, i) => (
-                              <img 
-                                key={i} 
-                                src={photo} 
-                                alt={`Bus photo ${i}`} 
-                                className="h-10 w-10 rounded-full object-cover border-2 border-white shadow-sm ring-1 ring-slate-200"
-                              />
-                            ))}
-                            {bus.photos.length > 3 && (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-xs font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 z-10">
-                                +{bus.photos.length - 3}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">No photos</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        {bus.driver_photo ? (
-                          <button
-                            type="button"
-                            className="rounded-lg transition-transform hover:scale-105"
-                            onClick={() => openSingleImage(bus.driver_photo!)}
-                            title="Open driver photo"
-                          >
-                            <img
-                              src={bus.driver_photo}
-                              alt={`${bus.bus_name} driver`}
-                              className="h-10 w-10 rounded-lg object-cover border border-slate-200 shadow-sm"
-                            />
-                          </button>
-                        ) : (
-                          <span className="text-gray-400 text-sm">N/A</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        {bus.driving_license ? (
-                          <button
-                            type="button"
-                            className="rounded-lg transition-transform hover:scale-105"
-                            onClick={() => openSingleImage(bus.driving_license!)}
-                            title="Open driving license"
-                          >
-                            <img
-                              src={bus.driving_license}
-                              alt={`${bus.bus_name} license`}
-                              className="h-10 w-10 rounded-lg object-cover border border-slate-200 shadow-sm"
-                            />
-                          </button>
-                        ) : (
-                          <span className="text-gray-400 text-sm">N/A</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-right flex justify-end gap-2">
-                        <Button variant="outline" size="sm" className="h-11 w-11 rounded-md border-[#1e3a8a]/70 bg-[#1e3a8a]/70 text-white shadow-sm hover:border-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white" onClick={() => handleOpenSheet(bus)} title="Edit bus" aria-label="Edit bus">
-                          <Pencil className="h-4.5 w-4.5" />
-                        </Button>
-                        <Button variant="outline" size="sm" className="h-11 w-11 rounded-md border-[#991b1b]/70 bg-[#991b1b]/70 text-white shadow-sm hover:border-[#991b1b] hover:bg-[#991b1b] hover:text-white" onClick={() => setDeleteId(bus._id)} title="Delete bus" aria-label="Delete bus">
-                          <Trash2 className="h-4.5 w-4.5" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+        {(isLoading || isInitialLoading) ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <Skeleton className="h-48 w-full rounded-none" />
+                <div className="space-y-3 p-5">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex gap-2 pt-2">
+                    <Skeleton className="h-11 flex-1 rounded-xl" />
+                    <Skeleton className="h-11 w-11 rounded-xl" />
+                    <Skeleton className="h-11 w-11 rounded-xl" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        ) : busesResponse?.data?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-slate-400">
+            <ImageOff className="h-12 w-12" />
+            <p className="text-base font-medium text-slate-500">No buses found</p>
+            <p className="text-sm">Try adjusting your search or filters.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {busesResponse?.data.map((bus) => (
+              <div
+                key={bus._id}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                <BusImageSlider
+                  images={bus.photos ?? []}
+                  busName={bus.bus_name}
+                  isActive={bus.is_active}
+                  onImageClick={() => bus.photos?.length && openLightbox(bus.photos)}
+                />
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="truncate text-lg font-bold text-slate-900" title={bus.bus_name}>
+                    {bus.bus_name}
+                  </h3>
+                  <p className="mt-0.5 inline-flex w-fit items-center rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-medium text-slate-600">
+                    {bus.bus_number}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 pt-1">
+                    <Button
+                      className="h-11 flex-1 rounded-xl bg-[#0077b6] font-semibold text-white shadow-sm transition-all hover:bg-[#036aa0]"
+                      onClick={() => setDetailsBus(bus)}
+                    >
+                      <Eye className="mr-2 h-4 w-4" /> View Details
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-11 w-11 shrink-0 rounded-xl border-[#1e3a8a]/70 bg-[#1e3a8a]/70 text-white shadow-sm hover:border-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white"
+                      onClick={() => handleOpenSheet(bus)}
+                      title="Edit bus"
+                      aria-label="Edit bus"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-11 w-11 shrink-0 rounded-xl border-[#991b1b]/70 bg-[#991b1b]/70 text-white shadow-sm hover:border-[#991b1b] hover:bg-[#991b1b] hover:text-white"
+                      onClick={() => setDeleteId(bus._id)}
+                      title="Delete bus"
+                      aria-label="Delete bus"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -802,8 +733,174 @@ export function Buses() {
         isConfirming={isDeleting}
       />
 
+      <DialogPrimitive.Root
+        open={!!detailsBus}
+        onOpenChange={(open) => {
+          if (!open) setDetailsBus(null);
+        }}
+      >
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-[90] bg-black/45 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          <DialogPrimitive.Content
+            className="fixed left-1/2 top-1/2 z-[100] flex max-h-[92vh] w-[calc(100%-2rem)] max-w-[760px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white shadow-2xl outline-none data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+            onPointerDownOutside={(e) => {
+              if (lightboxOpen) e.preventDefault();
+            }}
+            onInteractOutside={(e) => {
+              if (lightboxOpen) e.preventDefault();
+            }}
+            onEscapeKeyDown={(e) => {
+              if (lightboxOpen) {
+                e.preventDefault();
+                setLightboxOpen(false);
+              }
+            }}
+          >
+            {detailsBus && (
+              <>
+                <DialogPrimitive.Title className="sr-only">
+                  {detailsBus.bus_name} details
+                </DialogPrimitive.Title>
+                <DialogPrimitive.Description className="sr-only">
+                  Detailed information for {detailsBus.bus_name} ({detailsBus.bus_number}).
+                </DialogPrimitive.Description>
+
+                <DialogPrimitive.Close
+                  className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+                  aria-label="Close details"
+                >
+                  <X className="h-5 w-5" />
+                </DialogPrimitive.Close>
+
+                <div className="overflow-y-auto">
+                  <BusImageSlider
+                    images={detailsBus.photos ?? []}
+                    busName={detailsBus.bus_name}
+                    isActive={detailsBus.is_active}
+                    heightClass="h-72"
+                    autoPlay
+                    autoPlayIntervalMs={3000}
+                    onImageClick={() =>
+                      detailsBus.photos?.length && openLightbox(detailsBus.photos)
+                    }
+                  />
+
+                  <div className="space-y-6 p-7">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="text-2xl font-bold text-[#023047]">{detailsBus.bus_name}</h2>
+                        <span
+                          className={cn(
+                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1',
+                            detailsBus.is_active
+                              ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                              : 'bg-slate-100 text-slate-500 ring-slate-200',
+                          )}
+                        >
+                          {detailsBus.is_active ? (
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                          ) : (
+                            <CircleSlash className="h-3.5 w-3.5" />
+                          )}
+                          {detailsBus.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <p className="mt-2 inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 font-mono text-sm font-medium text-slate-600">
+                        {detailsBus.bus_number}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <DocumentTile
+                        label="Driver Photo"
+                        src={detailsBus.driver_photo}
+                        onOpen={() =>
+                          detailsBus.driver_photo && openSingleImage(detailsBus.driver_photo)
+                        }
+                      />
+                      <DocumentTile
+                        label="Driving License"
+                        src={detailsBus.driving_license}
+                        onOpen={() =>
+                          detailsBus.driving_license && openSingleImage(detailsBus.driving_license)
+                        }
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <DetailTile icon={Tag} label="Bus Type" value={detailsBus.bus_type} />
+                      <DetailTile
+                        icon={Users}
+                        label="Seats / Layout"
+                        value={totalSeatsToSelectValue(detailsBus.total_seats)}
+                      />
+                      <DetailTile
+                        icon={Building2}
+                        label="Operator"
+                        value={detailsBus.operator?.operator_name || 'Unassigned'}
+                      />
+                    </div>
+
+                    <div>
+                      <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                        Amenities
+                      </p>
+                      {detailsBus.amenities && detailsBus.amenities.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {detailsBus.amenities.map((amenity, i) => (
+                            <span
+                              key={i}
+                              className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-700 ring-1 ring-sky-200"
+                            >
+                              <BadgeCheck className="h-3.5 w-3.5" />
+                              {amenity}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-400">No amenities listed.</p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
+                      <p className="text-xs text-slate-400">
+                        Added {new Date(detailsBus.createdAt).toLocaleDateString()} · Updated{' '}
+                        {new Date(detailsBus.updatedAt).toLocaleDateString()}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="h-11 rounded-xl border-[#1e3a8a]/30 px-5 font-semibold text-[#1e3a8a] hover:bg-[#1e3a8a]/5"
+                          onClick={() => {
+                            const target = detailsBus;
+                            setDetailsBus(null);
+                            handleOpenSheet(target);
+                          }}
+                        >
+                          <Pencil className="mr-2 h-4 w-4" /> Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="h-11 rounded-xl border-rose-200 px-5 font-semibold text-rose-700 hover:bg-rose-50"
+                          onClick={() => {
+                            setDeleteId(detailsBus._id);
+                            setDetailsBus(null);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+
       {lightboxOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity" onClick={() => setLightboxOpen(false)}>
+        <div className="pointer-events-auto fixed inset-0 z-[120] flex items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity" onClick={() => setLightboxOpen(false)}>
           <button
             className="absolute right-4 top-4 text-white hover:text-gray-300 z-50 p-2"
             onClick={() => setLightboxOpen(false)}
@@ -847,5 +944,163 @@ export function Buses() {
         </div>
       )}
     </>
+  );
+}
+
+interface BusImageSliderProps {
+  images: string[];
+  busName: string;
+  isActive?: boolean;
+  heightClass?: string;
+  autoPlay?: boolean;
+  autoPlayIntervalMs?: number;
+  onImageClick?: () => void;
+}
+
+function BusImageSlider({
+  images,
+  busName,
+  isActive,
+  heightClass = 'h-48',
+  autoPlay = false,
+  autoPlayIntervalMs = 3000,
+  onImageClick,
+}: BusImageSliderProps) {
+  const [index, setIndex] = useState(0);
+  const safeIndex = images.length ? index % images.length : 0;
+
+  useEffect(() => {
+    if (!autoPlay || images.length <= 1) return;
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, autoPlayIntervalMs);
+    return () => clearInterval(timer);
+  }, [autoPlay, autoPlayIntervalMs, images.length, index]);
+
+  const go = (e: React.MouseEvent, dir: number) => {
+    e.stopPropagation();
+    setIndex((prev) => (prev + dir + images.length) % images.length);
+  };
+
+  return (
+    <div className={cn('relative w-full overflow-hidden bg-slate-100', heightClass)}>
+      {isActive !== undefined && (
+        <span
+          className={cn(
+            'absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ring-1',
+            isActive
+              ? 'bg-emerald-500/90 text-white ring-emerald-300'
+              : 'bg-slate-500/90 text-white ring-slate-300',
+          )}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          {isActive ? 'Active' : 'Inactive'}
+        </span>
+      )}
+
+      {images.length > 0 ? (
+        <>
+          <img
+            src={images[safeIndex]}
+            alt={`${busName} photo ${safeIndex + 1}`}
+            className="h-full w-full cursor-pointer object-cover transition-transform duration-300 hover:scale-[1.03]"
+            onClick={onImageClick}
+          />
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => go(e, -1)}
+                className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/60 group-hover:opacity-100"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => go(e, 1)}
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/60 group-hover:opacity-100"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIndex(i);
+                    }}
+                    className={cn(
+                      'h-1.5 rounded-full transition-all',
+                      i === safeIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/60 hover:bg-white/80',
+                    )}
+                    aria-label={`Go to photo ${i + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-slate-400">
+          <ImageOff className="h-8 w-8" />
+          <span className="text-sm font-medium">No photos</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface DetailTileProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}
+
+function DetailTile({ icon: Icon, label, value }: DetailTileProps) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+      <div className="flex items-center gap-2 text-slate-500">
+        <Icon className="h-4 w-4" />
+        <span className="text-xs font-semibold uppercase tracking-wide">{label}</span>
+      </div>
+      <p className="mt-1.5 truncate text-base font-semibold capitalize text-slate-800" title={value}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+interface DocumentTileProps {
+  label: string;
+  src?: string;
+  onOpen: () => void;
+}
+
+function DocumentTile({ label, src, onOpen }: DocumentTileProps) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-slate-200 p-3">
+      {src ? (
+        <button
+          type="button"
+          onClick={onOpen}
+          className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 transition-transform hover:scale-105"
+          title={`Open ${label.toLowerCase()}`}
+        >
+          <img src={src} alt={label} className="h-full w-full object-cover" />
+        </button>
+      ) : (
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
+          <ImageOff className="h-6 w-6" />
+        </div>
+      )}
+      <div>
+        <p className="text-sm font-semibold text-slate-700">{label}</p>
+        <p className="text-xs text-slate-400">{src ? 'Tap to view full size' : 'Not provided'}</p>
+      </div>
+    </div>
   );
 }

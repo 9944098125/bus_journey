@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
 import { AdminDashboardService } from "../services/admin-dashboard.service.js";
+import { sendItem, sendList } from "../utils/api-response.js";
 
 const parsePositiveInt = (
 	value: unknown,
@@ -20,34 +21,28 @@ export class AdminDashboardController {
 	private readonly dashboardService = new AdminDashboardService();
 
 	public async getKpis(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
 		try {
 			const data = await this.dashboardService.getKpis();
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "KPIs fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
 	}
 
 	public async getQuickActions(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
 		try {
 			const data = await this.dashboardService.getQuickActions();
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Quick actions fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
@@ -62,78 +57,63 @@ export class AdminDashboardController {
 			const topLimit = parsePositiveInt(req.query.topLimit, 3, 20);
 			const data = await this.dashboardService.getAnalytics(topLimit);
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Analytics fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
 	}
 
 	public async getRoleBreakdown(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
 		try {
 			const data = await this.dashboardService.getRoleBreakdown();
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Role breakdown fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
 	}
 
 	public async getAuthProviders(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
 		try {
 			const data = await this.dashboardService.getAuthProviderBreakdown();
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Auth providers fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
 	}
 
 	public async getNotificationPreferences(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
 		try {
 			const data = await this.dashboardService.getNotificationPreferences();
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Notification preferences fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
 	}
 
 	public async getAccountHealth(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
 		try {
 			const data = await this.dashboardService.getAccountHealth();
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Account health fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
@@ -148,10 +128,7 @@ export class AdminDashboardController {
 			const topLimit = parsePositiveInt(req.query.topLimit, 3, 20);
 			const data = await this.dashboardService.getWalletRewards(topLimit);
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Wallet rewards fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}
@@ -177,10 +154,12 @@ export class AdminDashboardController {
 				order,
 			});
 
-			res.status(200).json({
-				success: true,
-				count: data.length,
-				data,
+			sendList(req, res, "Recent accounts fetched successfully", {
+				pageNumber: 1,
+				pageSize: limit,
+				totalDocuments: data.length,
+				totalPages: 1,
+				documents: data,
 			});
 		} catch (error) {
 			next(error);
@@ -201,10 +180,7 @@ export class AdminDashboardController {
 				topLimit,
 			});
 
-			res.status(200).json({
-				success: true,
-				data,
-			});
+			sendItem(req, res, "Dashboard fetched successfully", data);
 		} catch (error) {
 			next(error);
 		}

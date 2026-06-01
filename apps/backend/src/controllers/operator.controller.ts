@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import type { IOperator } from "../interfaces/operator.interface.js";
 import { OperatorService } from "../services/operator.service.js";
+import { sendError, sendItem, sendList } from "../utils/api-response.js";
 
 const CONFLICT_MESSAGES = new Set([
   "Email already exists",
@@ -38,7 +39,7 @@ const getListFilters = (
   } else if (req.query.is_active !== undefined) {
     filters.is_active = req.query.is_active === "true";
   }
-  
+
   if (typeof req.query.search === "string" && req.query.search.trim() !== "") {
     filters.search = req.query.search.trim();
   }
@@ -58,11 +59,7 @@ export class OperatorController {
       const createdById = req.user?._id.toString();
 
       if (!createdById) {
-        res.status(401).json({
-          success: false,
-          message: "Authentication required",
-        });
-
+        sendError(req, res, 401, "Authentication required");
         return;
       }
 
@@ -71,33 +68,9 @@ export class OperatorController {
         createdById
       );
 
-      res.status(201).json({
-        success: true,
-        message: "Operator created successfully",
-        data: operator,
-      });
+      sendItem(req, res, "Operator created successfully", operator, 201);
     } catch (error) {
-      if (error instanceof Error) {
-        if (CONFLICT_MESSAGES.has(error.message)) {
-          res.status(409).json({
-            success: false,
-            message: error.message,
-          });
-
-          return;
-        }
-
-        if (BAD_REQUEST_MESSAGES.has(error.message)) {
-          res.status(400).json({
-            success: false,
-            message: error.message,
-          });
-
-          return;
-        }
-      }
-
-      next(error);
+      this.handleError(error, req, res, next);
     }
   }
 
@@ -107,14 +80,19 @@ export class OperatorController {
     next: NextFunction
   ): Promise<void> {
     try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
       const operators = await this.operatorService.getAllOperators(
         getListFilters(req)
       );
 
-      res.status(200).json({
-        success: true,
-        count: operators.length,
-        data: operators,
+      sendList(req, res, "Operators fetched successfully", {
+        pageNumber: page,
+        pageSize: limit,
+        totalDocuments: operators.length,
+        totalPages: 1,
+        documents: operators,
       });
     } catch (error) {
       next(error);
@@ -131,30 +109,9 @@ export class OperatorController {
 
       const operator = await this.operatorService.getOperatorById(id as string);
 
-      res.status(200).json({
-        success: true,
-        data: operator,
-      });
+      sendItem(req, res, "Operator fetched successfully", operator);
     } catch (error) {
-      if (error instanceof Error && NOT_FOUND_MESSAGES.has(error.message)) {
-        res.status(404).json({
-          success: false,
-          message: error.message,
-        });
-
-        return;
-      }
-
-      if (error instanceof Error && error.message === "Invalid operator id") {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-
-        return;
-      }
-
-      next(error);
+      this.handleError(error, req, res, next);
     }
   }
 
@@ -171,42 +128,9 @@ export class OperatorController {
         req.body as Partial<IOperator>
       );
 
-      res.status(200).json({
-        success: true,
-        message: "Operator updated successfully",
-        data: updatedOperator,
-      });
+      sendItem(req, res, "Operator updated successfully", updatedOperator);
     } catch (error) {
-      if (error instanceof Error) {
-        if (NOT_FOUND_MESSAGES.has(error.message)) {
-          res.status(404).json({
-            success: false,
-            message: error.message,
-          });
-
-          return;
-        }
-
-        if (CONFLICT_MESSAGES.has(error.message)) {
-          res.status(409).json({
-            success: false,
-            message: error.message,
-          });
-
-          return;
-        }
-
-        if (BAD_REQUEST_MESSAGES.has(error.message)) {
-          res.status(400).json({
-            success: false,
-            message: error.message,
-          });
-
-          return;
-        }
-      }
-
-      next(error);
+      this.handleError(error, req, res, next);
     }
   }
 
@@ -220,31 +144,35 @@ export class OperatorController {
 
       await this.operatorService.deleteOperator(id as string);
 
-      res.status(200).json({
-        success: true,
-        message: "Operator deleted successfully",
-      });
+      sendItem(req, res, "Operator deleted successfully", null);
     } catch (error) {
-      if (error instanceof Error && NOT_FOUND_MESSAGES.has(error.message)) {
-        res.status(404).json({
-          success: false,
-          message: error.message,
-        });
-
-        return;
-      }
-
-      if (error instanceof Error && error.message === "Invalid operator id") {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-
-        return;
-      }
-
-      next(error);
+      this.handleError(error, req, res, next);
     }
   }
 
+  private handleError(
+    error: unknown,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void {
+    if (error instanceof Error) {
+      if (CONFLICT_MESSAGES.has(error.message)) {
+        sendError(req, res, 409, error.message);
+        return;
+      }
+
+      if (NOT_FOUND_MESSAGES.has(error.message)) {
+        sendError(req, res, 404, error.message);
+        return;
+      }
+
+      if (BAD_REQUEST_MESSAGES.has(error.message)) {
+        sendError(req, res, 400, error.message);
+        return;
+      }
+    }
+
+    next(error);
+  }
 }

@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { createSlice } from 'utils/@reduxjs/toolkit';
 import { useInjectReducer } from 'utils/redux-injectors';
-import { baseQuery, endpoints, formatErrors } from 'utils/api/endpoints';
+import {
+  baseQuery,
+  endpoints,
+  formatErrors,
+  transformItemResponse,
+  transformListResponse,
+} from 'utils/api/endpoints';
 import type {
   Operator,
   OperatorListResponse,
@@ -48,6 +54,7 @@ export const operatorsApi = createApi({
         method: endpoints.operators.list.method,
         ...(params ? { params } : {}),
       }),
+      transformResponse: transformListResponse,
       providesTags: result =>
         result?.data
           ? [
@@ -66,6 +73,7 @@ export const operatorsApi = createApi({
       query: id => ({
         ...endpoints.operators.byId(id),
       }),
+      transformResponse: transformItemResponse,
       providesTags: (_result, _error, id) => [{ type: 'Operator', id }],
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
@@ -76,6 +84,7 @@ export const operatorsApi = createApi({
         ...endpoints.operators.create,
         body: payload,
       }),
+      transformResponse: transformItemResponse,
       invalidatesTags: [{ type: 'Operators', id: 'LIST' }],
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
@@ -89,6 +98,7 @@ export const operatorsApi = createApi({
         ...endpoints.operators.update(id),
         body: payload,
       }),
+      transformResponse: transformItemResponse,
       invalidatesTags: (_result, _error, { id }) => [
         { type: 'Operators', id: 'LIST' },
         { type: 'Operator', id },
@@ -102,6 +112,7 @@ export const operatorsApi = createApi({
       query: id => ({
         ...endpoints.operators.delete(id),
       }),
+      transformResponse: transformItemResponse,
       invalidatesTags: (_result, _error, id) => [
         { type: 'Operators', id: 'LIST' },
         { type: 'Operator', id },

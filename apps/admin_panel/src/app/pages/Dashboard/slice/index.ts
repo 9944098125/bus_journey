@@ -3,7 +3,13 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useInjectReducer } from 'utils/redux-injectors';
-import { baseQuery, endpoints, formatErrors } from 'utils/api/endpoints';
+import {
+  baseQuery,
+  endpoints,
+  formatErrors,
+  transformItemResponse,
+  transformListResponse,
+} from 'utils/api/endpoints';
 import type {
   DashboardAnalyticsData,
   DashboardApiResponse,
@@ -61,6 +67,7 @@ export const dashboardApi = createApi({
         method: endpoints.dashboard.full.method,
         ...(params ? { params } : {}),
       }),
+      transformResponse: transformItemResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -71,6 +78,7 @@ export const dashboardApi = createApi({
         url: endpoints.dashboard.kpis.url,
         method: endpoints.dashboard.kpis.method,
       }),
+      transformResponse: transformItemResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -83,6 +91,7 @@ export const dashboardApi = createApi({
         url: endpoints.dashboard.quickActions.url,
         method: endpoints.dashboard.quickActions.method,
       }),
+      transformResponse: transformItemResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -96,6 +105,7 @@ export const dashboardApi = createApi({
         method: endpoints.dashboard.analytics.method,
         ...(params ? { params } : {}),
       }),
+      transformResponse: transformItemResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -109,6 +119,7 @@ export const dashboardApi = createApi({
         method: endpoints.dashboard.walletRewards.method,
         ...(params ? { params } : {}),
       }),
+      transformResponse: transformItemResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },
@@ -122,6 +133,7 @@ export const dashboardApi = createApi({
         method: endpoints.dashboard.recentAccounts.method,
         ...(params ? { params } : {}),
       }),
+      transformResponse: transformListResponse,
       transformErrorResponse(baseQueryReturnValue) {
         return formatErrors(baseQueryReturnValue.data);
       },

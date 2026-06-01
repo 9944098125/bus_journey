@@ -22,6 +22,72 @@ export const formatErrors = (errors: any) => {
   return errors?.message || errors?.error || 'Something went wrong';
 };
 
+/**
+ * Standard backend response envelope:
+ * { status, statusText, data: { message, data }, meta: { url } }
+ *
+ * The helpers below unwrap that envelope back into the flat shapes the
+ * RTK Query endpoints / components already expect, so consumers stay unchanged.
+ */
+
+/** Unwrap a paginated list envelope. `data.data` = { pageNumber, pageSize, totalPages, totalDocuments, documents } */
+export const transformListResponse = (response: any) => {
+  const inner = response?.data?.data ?? {};
+  const documents = inner.documents ?? [];
+  const totalDocuments = inner.totalDocuments ?? documents.length;
+  const pageSize = inner.pageSize ?? documents.length;
+  const pageNumber = inner.pageNumber ?? 1;
+  const totalPages = inner.totalPages ?? 1;
+
+  return {
+    success: true,
+    message: response?.data?.message ?? '',
+    data: documents,
+    documents,
+    total: totalDocuments,
+    count: totalDocuments,
+    totalDocuments,
+    page: pageNumber,
+    pageNumber,
+    limit: pageSize,
+    pageSize,
+    totalPages,
+  };
+};
+
+/** Unwrap a single-item / detail / mutation envelope. `data.data` = the item (or null). */
+export const transformItemResponse = (response: any) => ({
+  success: true,
+  message: response?.data?.message ?? '',
+  data: response?.data?.data ?? null,
+});
+
+/** Unwrap an auth envelope. `data.data` = { token, user }. */
+export const transformAuthResponse = (response: any) => ({
+  success: true,
+  message: response?.data?.message ?? '',
+  token: response?.data?.data?.token ?? '',
+  data: response?.data?.data?.user ?? null,
+});
+
+/** Unwrap an upload envelope. `data.data` = { imageUrl, publicId }. */
+export const transformUploadResponse = (response: any) => {
+  const imageUrl =
+    response?.data?.data?.imageUrl ??
+    response?.data?.imageUrl ??
+    response?.imageUrl;
+
+  if (!imageUrl) {
+    throw new Error('Upload succeeded but no image URL was returned');
+  }
+
+  return {
+    imageUrl,
+    publicId:
+      response?.data?.data?.publicId ?? response?.data?.publicId ?? '',
+  };
+};
+
 export const HTTP_METHODS = {
   GET: 'GET',
   POST: 'POST',

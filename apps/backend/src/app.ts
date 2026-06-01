@@ -11,6 +11,10 @@ import usersRoutes from "./routes/user.route.js";
 
 import busesRoutes from "./routes/bus.route.js";
 
+import routesRoutes from "./routes/route.route.js";
+
+import { sendError } from "./utils/api-response.js";
+
 const app: Application = express();
 
 /**
@@ -87,6 +91,8 @@ app.use("/api/operators", operatorsRoutes);
 
 app.use("/api/buses", busesRoutes);
 
+app.use("/api/routes", routesRoutes);
+
 app.use("/api/admin/dashboard", adminDashboardRoutes);
 
 /**
@@ -96,10 +102,7 @@ app.use("/api/admin/dashboard", adminDashboardRoutes);
 app.use((req, res) => {
 	console.log(`[DEBUG] 404 — no route for ${req.method} ${req.originalUrl}`);
 
-	res.status(404).json({
-		success: false,
-		message: "Route not found",
-	});
+	sendError(req, res, 404, "Route not found");
 });
 
 /**
@@ -109,16 +112,13 @@ app.use((req, res) => {
 app.use(
 	(
 		error: Error,
-		_req: express.Request,
+		req: express.Request,
 		res: express.Response,
 		_next: express.NextFunction,
 	): void => {
 		console.error(error);
 
-		res.status(500).json({
-			success: false,
-			message: error.message || "Internal Server Error",
-		});
+		sendError(req, res, 500, error.message || "Internal Server Error");
 	},
 );
 

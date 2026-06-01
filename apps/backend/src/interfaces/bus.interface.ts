@@ -4,7 +4,7 @@ export interface IBus extends Document {
   bus_name: string;
   bus_number: string;
   bus_type: string;
-  total_seats: number;
+  total_seats: string;
   operator: Types.ObjectId;
   amenities: string[];
   driver_photo?: string;

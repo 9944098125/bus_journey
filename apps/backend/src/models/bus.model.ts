@@ -25,9 +25,9 @@ const busesSchema = new Schema<IBus>(
     },
 
     total_seats: {
-      type: Number,
+      type: String,
       required: true,
-      min: 1,
+      trim: true,
     },
 
     operator: {

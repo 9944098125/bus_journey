@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
 import { UserService } from "../services/user.service.js";
+import { sendError, sendItem, sendList } from "../utils/api-response.js";
 
 export class UserController {
 	private readonly userService = new UserService();
@@ -17,16 +18,13 @@ export class UserController {
 		try {
 			const { user, emailSent } = await this.userService.registerUser(req.body);
 
-			res.status(201).json({
-				success: true,
-
-				message:
-					"User registered successfully. Check your email for the activation link.",
-
-				data: user,
-
-				emailSent,
-			});
+			sendItem(
+				req,
+				res,
+				"User registered successfully. Check your email for the activation link.",
+				{ user, emailSent },
+				201,
+			);
 		} catch (error) {
 			if (
 				error instanceof Error &&
@@ -41,10 +39,7 @@ export class UserController {
 						? 409
 						: 503;
 
-				res.status(status).json({
-					success: false,
-					message: error.message,
-				});
+				sendError(req, res, status, error.message);
 
 				return;
 			}
@@ -65,15 +60,7 @@ export class UserController {
 		try {
 			const { user, token } = await this.userService.loginUser(req.body);
 
-			res.status(200).json({
-				success: true,
-
-				message: "Login successful",
-
-				token,
-
-				data: user,
-			});
+			sendItem(req, res, "Login successful", { token, user });
 		} catch (error) {
 			if (
 				error instanceof Error &&
@@ -83,11 +70,7 @@ export class UserController {
 					error.message ===
 						"Account not activated. Use your registration login link first.")
 			) {
-				res.status(401).json({
-					success: false,
-
-					message: error.message,
-				});
+				sendError(req, res, 401, error.message);
 
 				return;
 			}
@@ -109,10 +92,7 @@ export class UserController {
 			const user = req.firstLoginUser;
 
 			if (!user) {
-				res.status(400).json({
-					success: false,
-					message: "Login link validation failed",
-				});
+				sendError(req, res, 400, "Login link validation failed");
 
 				return;
 			}
@@ -121,11 +101,9 @@ export class UserController {
 				user._id.toString(),
 			);
 
-			res.status(200).json({
-				success: true,
-				message: "Account activated successfully",
+			sendItem(req, res, "Account activated successfully", {
 				token: result.token,
-				data: result.user,
+				user: result.user,
 			});
 		} catch (error) {
 			next(error);
@@ -146,11 +124,7 @@ export class UserController {
 
 			const user = await this.userService.getUserById(id as string);
 
-			res.status(200).json({
-				success: true,
-
-				data: user,
-			});
+			sendItem(req, res, "User fetched successfully", user);
 		} catch (error) {
 			next(error);
 		}
@@ -173,13 +147,7 @@ export class UserController {
 				req.body,
 			);
 
-			res.status(200).json({
-				success: true,
-
-				message: "User updated successfully",
-
-				data: updatedUser,
-			});
+			sendItem(req, res, "User updated successfully", updatedUser);
 		} catch (error) {
 			next(error);
 		}
@@ -199,11 +167,7 @@ export class UserController {
 
 			await this.userService.deleteUser(id as string);
 
-			res.status(200).json({
-				success: true,
-
-				message: "User deleted successfully",
-			});
+			sendItem(req, res, "User deleted successfully", null);
 		} catch (error) {
 			next(error);
 		}
@@ -216,10 +180,7 @@ export class UserController {
 	): Promise<void> {
 		try {
 			if (!req.file) {
-				res.status(400).json({
-					success: false,
-					message: "No file uploaded",
-				});
+				sendError(req, res, 400, "No file uploaded");
 
 				return;
 			}
@@ -229,20 +190,10 @@ export class UserController {
 			 */
 
 			const uploadedImage = await this.userService.uploadImage(req.file.buffer);
-			const imageUrl = uploadedImage.secure_url;
 
-			res.status(200).json({
-				success: true,
-
-				message: "Profile image uploaded successfully",
-
-				imageUrl,
-
-				data: {
-					imageUrl,
-
-					publicId: uploadedImage.public_id,
-				},
+			sendItem(req, res, "Profile image uploaded successfully", {
+				imageUrl: uploadedImage.secure_url,
+				publicId: uploadedImage.public_id,
 			});
 		} catch (error) {
 			next(error);
@@ -254,7 +205,7 @@ export class UserController {
 	 */
 
 	public async deleteAllUsers(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
@@ -262,16 +213,14 @@ export class UserController {
 			const { deletedCount, names, deletedUsers } =
 				await this.userService.deleteAllUsers();
 
-			res.status(200).json({
-				success: true,
-				message:
-					deletedCount === 0
-						? "No users to delete"
-						: "All users and admins deleted successfully",
-				count: deletedCount,
-				names,
-				deletedUsers,
-			});
+			sendItem(
+				req,
+				res,
+				deletedCount === 0
+					? "No users to delete"
+					: "All users and admins deleted successfully",
+				{ count: deletedCount, names, deletedUsers },
+			);
 		} catch (error) {
 			next(error);
 		}
@@ -282,31 +231,24 @@ export class UserController {
 	 */
 
 	public async getAllUsers(
-		_req: Request,
+		req: Request,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
-		console.log("[DEBUG] UserController.getAllUsers — start");
-
 		try {
+			const page = parseInt(req.query.page as string) || 1;
+			const limit = parseInt(req.query.limit as string) || 10;
+
 			const users = await this.userService.getAllUsers();
 
-			console.log(
-				"[DEBUG] UserController.getAllUsers — fetched",
-				users.length,
-				"user(s), sending response",
-			);
-
-			res.status(200).json({
-				success: true,
-
-				count: users.length,
-
-				data: users,
+			sendList(req, res, "Users fetched successfully", {
+				pageNumber: page,
+				pageSize: limit,
+				totalDocuments: users.length,
+				totalPages: 1,
+				documents: users,
 			});
 		} catch (error) {
-			console.error("[DEBUG] UserController.getAllUsers — error:", error);
-
 			next(error);
 		}
 	}

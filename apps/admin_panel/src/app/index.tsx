@@ -16,6 +16,7 @@ import { Dashboard } from './pages/Dashboard/loadable';
 import { Operators } from './pages/Operators/loadable';
 import { OperatorDetails } from './pages/OperatorDetails/loadable';
 import { Buses } from './pages/Buses/loadable';
+import { Routes as RoutesPage } from './pages/Routes/loadable';
 import { useTranslation } from 'react-i18next';
 import { useGlobalSlice } from './slice';
 import { RedirectIfAuth } from './components/auth/redirect-if-auth';
@@ -47,6 +48,7 @@ export function App() {
               <Route path="/operators" element={<Operators />} />
               <Route path="/operators/:id" element={<OperatorDetails />} />
               <Route path="/buses" element={<Buses />} />
+              <Route path="/routes" element={<RoutesPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Route>
