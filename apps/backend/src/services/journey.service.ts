@@ -6,7 +6,7 @@ import type { IBus } from "../interfaces/bus.interface.js";
 import { busRepository } from "../repositories/bus.repository.js";
 import { JourneyRepository } from "../repositories/journey.repository.js";
 import { RouteRepository } from "../repositories/route.repository.js";
-import { parseSeatCount } from "../utils/seats.js";
+import { parseJourneySeatCapacity } from "../utils/seats.js";
 
 const JOURNEY_NOT_FOUND = "Journey not found";
 const INVALID_JOURNEY_ID = "Invalid journey id";
@@ -171,7 +171,7 @@ export class JourneyService {
         options.route.estimated_duration_minutes
       );
 
-    const capacity = parseSeatCount(options.bus.total_seats);
+    const capacity = parseJourneySeatCapacity(options.bus.total_seats);
     const available_seats =
       options.available_seats !== undefined
         ? Math.max(0, Number(options.available_seats) || 0)

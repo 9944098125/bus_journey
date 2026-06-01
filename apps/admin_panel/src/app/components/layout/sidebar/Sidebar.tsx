@@ -17,6 +17,7 @@ import { cn } from 'utils/twm';
 import { useBusesSlice, useGetBusesQuery } from 'app/pages/Buses/slice';
 import { useOperatorsSlice, useGetOperatorsQuery } from 'app/pages/Operators/slice';
 import { useRoutesSlice, useGetRoutesQuery } from 'app/pages/Routes/slice';
+import { useJourneysSlice, useGetJourneysQuery } from 'app/pages/Journeys/slice';
 
 import SidebarGroup from './sidebar-group';
 import SidebarProfile from './sidebar-profile';
@@ -57,14 +58,17 @@ function SidebarPanel({
   useBusesSlice();
   useOperatorsSlice();
   useRoutesSlice();
+  useJourneysSlice();
   const { data: busesResponse } = useGetBusesQuery({ limit: 1 });
   const { data: operatorsResponse } = useGetOperatorsQuery(undefined);
   const { data: routesResponse } = useGetRoutesQuery({ limit: 1 });
+  const { data: journeysResponse } = useGetJourneysQuery({ limit: 1 });
 
   const totalBuses = busesResponse?.total;
   const totalOperators =
     operatorsResponse?.total ?? operatorsResponse?.data?.length;
   const totalRoutes = routesResponse?.total;
+  const totalJourneys = journeysResponse?.total;
 
   const dynamicGroups = useMemo(() => {
     return sidebarNavGroups.map(group => ({
@@ -86,10 +90,15 @@ function SidebarPanel({
             ...item,
             badge: totalRoutes !== undefined ? totalRoutes : undefined,
           };
+        if (item.id === 'journeys')
+          return {
+            ...item,
+            badge: totalJourneys !== undefined ? totalJourneys : undefined,
+          };
         return item;
       }),
     }));
-  }, [totalBuses, totalOperators, totalRoutes]);
+  }, [totalBuses, totalOperators, totalRoutes, totalJourneys]);
 
   const filteredGroups = useSidebarFilter(searchQuery, dynamicGroups);
 

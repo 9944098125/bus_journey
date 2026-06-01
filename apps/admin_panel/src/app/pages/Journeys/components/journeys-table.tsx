@@ -1,12 +1,12 @@
 import React from 'react';
-import { Loader2, Route as RouteIcon } from 'lucide-react';
+import { Loader2, Map } from 'lucide-react';
 
 import { Button } from '../../../components/ui/button';
-import { RouteItem } from '../slice/types';
-import { RouteRow } from './route-row';
+import { JourneyItem } from '../slice/types';
+import { JourneyRow } from './journey-row';
 
-interface RoutesTableProps {
-  routes: RouteItem[];
+interface JourneysTableProps {
+  journeys: JourneyItem[];
   totalCount: number;
   currentPage: number;
   totalPages: number;
@@ -14,26 +14,25 @@ interface RoutesTableProps {
   isLoading?: boolean;
   expandedId: string | null;
   onToggleExpand: (id: string) => void;
-  onEdit: (route: RouteItem) => void;
-  onView: (route: RouteItem) => void;
+  onEdit: (journey: JourneyItem) => void;
   onDelete: (id: string) => void;
   onPrevPage: () => void;
   onNextPage: () => void;
 }
 
 const HEADERS = [
+  'Journey',
   'Route',
-  'Path',
-  'Distance',
-  'Duration',
-  'Base Fare',
-  'Stops',
+  'Bus',
+  'Departure',
+  'Fare',
+  'Bus seats',
   'Status',
-  'View',
+  'Active',
 ];
 
-export function RoutesTable({
-  routes,
+export function JourneysTable({
+  journeys,
   totalCount,
   currentPage,
   totalPages,
@@ -42,11 +41,10 @@ export function RoutesTable({
   expandedId,
   onToggleExpand,
   onEdit,
-  onView,
   onDelete,
   onPrevPage,
   onNextPage,
-}: RoutesTableProps) {
+}: JourneysTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
@@ -71,34 +69,34 @@ export function RoutesTable({
                   <div className="flex flex-col items-center gap-2 text-slate-400">
                     <Loader2 className="h-8 w-8 animate-spin text-[#0077b6]" />
                     <p className="text-sm font-medium text-slate-500">
-                      Loading routes...
+                      Loading journeys...
                     </p>
                   </div>
                 </td>
               </tr>
-            ) : routes.length === 0 ? (
+            ) : journeys.length === 0 ? (
               <tr>
                 <td colSpan={10} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center gap-2 text-slate-400">
-                    <RouteIcon className="h-10 w-10" />
+                    <Map className="h-10 w-10" />
                     <p className="text-base font-medium text-slate-500">
-                      No routes found
+                      No journeys found
                     </p>
                     <p className="text-sm">
-                      Try adjusting your search or filters.
+                      Try adjusting your search or filters, or schedule a new
+                      journey.
                     </p>
                   </div>
                 </td>
               </tr>
             ) : (
-              routes.map(route => (
-                <RouteRow
-                  key={route._id}
-                  route={route}
-                  isExpanded={expandedId === route._id}
+              journeys.map(journey => (
+                <JourneyRow
+                  key={journey._id}
+                  journey={journey}
+                  isExpanded={expandedId === journey._id}
                   onToggleExpand={onToggleExpand}
                   onEdit={onEdit}
-                  onView={onView}
                   onDelete={onDelete}
                 />
               ))
@@ -115,8 +113,9 @@ export function RoutesTable({
               {(currentPage - 1) * pageSize + 1}–
               {Math.min(currentPage * pageSize, totalCount)}
             </span>{' '}
-            of <span className="font-medium text-slate-700">{totalCount}</span>{' '}
-            routes
+            of{' '}
+            <span className="font-medium text-slate-700">{totalCount}</span>{' '}
+            journeys
           </p>
           <div className="flex items-center gap-2">
             <Button

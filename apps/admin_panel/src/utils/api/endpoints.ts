@@ -220,4 +220,26 @@ export const endpoints = {
       method: HTTP_METHODS.DELETE,
     }),
   },
+  journeys: {
+    list: {
+      url: '/journeys',
+      method: HTTP_METHODS.GET,
+    },
+    create: {
+      url: '/journeys',
+      method: HTTP_METHODS.POST,
+    },
+    byId: (id: string) => ({
+      url: `/journeys/${id}`,
+      method: HTTP_METHODS.GET,
+    }),
+    update: (id: string) => ({
+      url: `/journeys/${id}`,
+      method: HTTP_METHODS.PATCH,
+    }),
+    delete: (id: string) => ({
+      url: `/journeys/${id}`,
+      method: HTTP_METHODS.DELETE,
+    }),
+  },
 };

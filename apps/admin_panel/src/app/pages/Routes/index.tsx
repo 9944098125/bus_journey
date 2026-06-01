@@ -16,6 +16,7 @@ import { RoutesHeader, RouteStatusFilter } from './components/routes-header';
 import { RouteStats } from './components/route-stats';
 import { RoutesTable } from './components/routes-table';
 import { RouteFormSheet } from './components/route-form-sheet';
+import { RouteMapDialog } from './components/route-map-dialog';
 
 export function Routes() {
   useRoutesSlice();
@@ -50,6 +51,7 @@ export function Routes() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingRoute, setEditingRoute] = useState<RouteItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewRoute, setViewRoute] = useState<RouteItem | null>(null);
 
   const openCreateSheet = () => {
     setEditingRoute(null);
@@ -116,6 +118,7 @@ export function Routes() {
             setExpandedId(prev => (prev === id ? null : id))
           }
           onEdit={openEditSheet}
+          onView={setViewRoute}
           onDelete={setDeleteId}
           onPrevPage={() => setPage(p => Math.max(1, p - 1))}
           onNextPage={() => setPage(p => Math.min(totalPages, p + 1))}
@@ -126,6 +129,16 @@ export function Routes() {
         open={isSheetOpen}
         editingRoute={editingRoute}
         onClose={closeSheet}
+      />
+
+      <RouteMapDialog
+        open={!!viewRoute}
+        onOpenChange={open => !open && setViewRoute(null)}
+        routeName={viewRoute?.route_name ?? ''}
+        sourceCity={viewRoute?.source_city ?? ''}
+        sourceState={viewRoute?.source_state}
+        destinationCity={viewRoute?.destination_city ?? ''}
+        destinationState={viewRoute?.destination_state}
       />
 
       <ConfirmationDialog

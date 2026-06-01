@@ -3,8 +3,6 @@ import {
   ArrowRight,
   ChevronDown,
   Clock,
-  GitBranch,
-  MapPin,
   Pencil,
   Trash2,
 } from 'lucide-react';
@@ -16,34 +14,43 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../components/ui/tooltip';
-import { RouteItem } from '../slice/types';
-import { formatCurrency, formatDuration } from './route-utils';
-import { StopsTimeline } from './stops-timeline';
+import { JourneyItem } from '../slice/types';
+import { JourneyDetailPanel } from './journey-detail-panel';
+import {
+  JOURNEY_STATUS_LABELS,
+  JOURNEY_STATUS_STYLES,
+  formatCurrency,
+  formatDateTime,
+  getJourneySeatsDisplay,
+  isPopulatedBus,
+  isPopulatedRoute,
+} from './journey-utils';
 
-interface RouteRowProps {
-  route: RouteItem;
+interface JourneyRowProps {
+  journey: JourneyItem;
   isExpanded: boolean;
   onToggleExpand: (id: string) => void;
-  onEdit: (route: RouteItem) => void;
-  onView: (route: RouteItem) => void;
+  onEdit: (journey: JourneyItem) => void;
   onDelete: (id: string) => void;
 }
 
-export function RouteRow({
-  route,
+export function JourneyRow({
+  journey,
   isExpanded,
   onToggleExpand,
   onEdit,
-  onView,
   onDelete,
-}: RouteRowProps) {
+}: JourneyRowProps) {
+  const route = isPopulatedRoute(journey.route) ? journey.route : null;
+  const bus = isPopulatedBus(journey.bus) ? journey.bus : null;
+
   return (
     <>
       <tr className="transition-colors hover:bg-slate-50/70">
         <td className="px-4 py-4">
           <button
             type="button"
-            onClick={() => onToggleExpand(route._id)}
+            onClick={() => onToggleExpand(journey._id)}
             className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
             title={isExpanded ? 'Hide details' : 'Show details'}
             aria-label="Toggle details"
@@ -56,73 +63,68 @@ export function RouteRow({
           </button>
         </td>
         <td className="px-6 py-4">
-          <div className="font-semibold text-slate-900">{route.route_name}</div>
-          <div className="mt-0.5 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-500">
-            {route.route_code}
-          </div>
-        </td>
-        <td className="px-6 py-4">
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="font-medium">{route.source_city}</span>
-            <ArrowRight className="h-4 w-4 text-slate-400" />
-            <span className="font-medium">{route.destination_city}</span>
-          </div>
-          {(route.source_state || route.destination_state) && (
-            <div className="mt-0.5 text-xs text-slate-400">
-              {route.source_state} → {route.destination_state}
-            </div>
+          <div className="font-semibold text-slate-900">{journey.journey_code}</div>
+          {route && (
+            <div className="mt-0.5 text-xs text-slate-500">{route.route_name}</div>
           )}
         </td>
-        <td className="px-6 py-4 text-slate-700">{route.distance_km} km</td>
+        <td className="px-6 py-4">
+          {route ? (
+            <div className="flex items-center gap-2 text-slate-700">
+              <span className="font-medium">{route.source_city}</span>
+              <ArrowRight className="h-4 w-4 text-slate-400" />
+              <span className="font-medium">{route.destination_city}</span>
+            </div>
+          ) : (
+            <span className="text-slate-400">—</span>
+          )}
+        </td>
+        <td className="px-6 py-4">
+          {bus ? (
+            <div>
+              <div className="font-medium text-slate-800">{bus.bus_name}</div>
+              <div className="text-xs text-slate-500">{bus.bus_number}</div>
+            </div>
+          ) : (
+            <span className="text-slate-400">—</span>
+          )}
+        </td>
         <td className="px-6 py-4">
           <span className="inline-flex items-center gap-1.5 text-slate-700">
             <Clock className="h-4 w-4 text-slate-400" />
-            {formatDuration(route.estimated_duration_minutes)}
+            {formatDateTime(journey.departure_at)}
           </span>
         </td>
         <td className="px-6 py-4 font-semibold text-slate-900">
-          {formatCurrency(route.base_fare)}
+          {formatCurrency(journey.fare)}
+        </td>
+        <td className="px-6 py-4 text-slate-700">
+          {getJourneySeatsDisplay(journey)}
         </td>
         <td className="px-6 py-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700 ring-1 ring-violet-200">
-            <GitBranch className="h-3.5 w-3.5" />
-            {route.stops.length}
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
+              JOURNEY_STATUS_STYLES[journey.status]
+            }`}
+          >
+            {JOURNEY_STATUS_LABELS[journey.status]}
           </span>
         </td>
         <td className="px-6 py-4">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
-              route.is_active
+              journey.is_active
                 ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
                 : 'bg-slate-100 text-slate-500 ring-slate-200'
             }`}
           >
             <span
               className={`h-1.5 w-1.5 rounded-full ${
-                route.is_active ? 'bg-emerald-500' : 'bg-slate-400'
+                journey.is_active ? 'bg-emerald-500' : 'bg-slate-400'
               }`}
             />
-            {route.is_active ? 'Active' : 'Inactive'}
+            {journey.is_active ? 'Active' : 'Inactive'}
           </span>
-        </td>
-        <td className="px-6 py-4">
-          <TooltipProvider delayDuration={150}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-10 gap-1.5 rounded-md border-[#0077b6]/70 bg-[#0077b6]/10 px-3 text-[#0077b6] shadow-sm hover:border-[#0077b6] hover:bg-[#0077b6]/15 hover:text-[#0077b6]"
-                  onClick={() => onView(route)}
-                  aria-label="View route on map"
-                >
-                  <MapPin className="h-4 w-4" />
-                  View
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>View route on map</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </td>
         <td className="px-6 py-4">
           <TooltipProvider delayDuration={150}>
@@ -133,13 +135,13 @@ export function RouteRow({
                     variant="outline"
                     size="sm"
                     className="h-10 w-10 rounded-md border-[#1e3a8a]/70 bg-[#1e3a8a]/70 text-white shadow-sm hover:border-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white"
-                    onClick={() => onEdit(route)}
-                    aria-label="Edit route"
+                    onClick={() => onEdit(journey)}
+                    aria-label="Edit journey"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Edit route details</TooltipContent>
+                <TooltipContent>Edit journey</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -147,13 +149,13 @@ export function RouteRow({
                     variant="outline"
                     size="sm"
                     className="h-10 w-10 rounded-md border-[#991b1b]/70 bg-[#991b1b]/70 text-white shadow-sm hover:border-[#991b1b] hover:bg-[#991b1b] hover:text-white"
-                    onClick={() => onDelete(route._id)}
-                    aria-label="Delete route"
+                    onClick={() => onDelete(journey._id)}
+                    aria-label="Delete journey"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Delete route</TooltipContent>
+                <TooltipContent>Delete journey</TooltipContent>
               </Tooltip>
             </div>
           </TooltipProvider>
@@ -162,7 +164,7 @@ export function RouteRow({
       {isExpanded && (
         <tr className="bg-slate-50/60">
           <td colSpan={10} className="px-6 py-6">
-            <StopsTimeline stops={route.stops} />
+            <JourneyDetailPanel journey={journey} />
           </td>
         </tr>
       )}

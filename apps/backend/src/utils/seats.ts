@@ -35,3 +35,29 @@ export function parseSeatCount(value: string | number | undefined | null): numbe
 
   return base;
 }
+
+/**
+ * Capacity stored on a journey matches the number shown in the bus seat label
+ * (e.g. "25 bearths up & down" → 25), not the doubled berth total used elsewhere.
+ */
+export function parseJourneySeatCapacity(
+  value: string | number | undefined | null
+): number {
+  if (value === undefined || value === null) {
+    return 0;
+  }
+
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  const match = value.trim().match(/\d+/);
+
+  if (!match) {
+    return 0;
+  }
+
+  const base = parseInt(match[0], 10);
+
+  return Number.isNaN(base) ? 0 : base;
+}
