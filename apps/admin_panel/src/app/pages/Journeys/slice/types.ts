@@ -52,6 +52,8 @@ export interface Journey {
   status: JourneyStatus;
   is_active: boolean;
   notes?: string;
+  driver_photo?: string;
+  driving_license?: string;
   created_by?: string | JourneyCreator;
   createdAt: string;
   updatedAt: string;
@@ -109,6 +111,8 @@ export interface CreateJourneyMutationArg {
   status?: JourneyStatus;
   is_active?: boolean;
   notes?: string;
+  driver_photo?: string;
+  driving_license?: string;
 }
 
 export interface UpdateJourneyMutationArg

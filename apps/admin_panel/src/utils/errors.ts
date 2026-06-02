@@ -23,6 +23,11 @@ export const getErrorMessage = (
   }
 
   if (err.data && typeof err.data === 'object') {
+    // If there is a nested envelope: err.data.data.message
+    const nestedData = (err.data as any).data;
+    if (nestedData && nestedData.message) {
+      return nestedData.message;
+    }
     return err.data.message || err.data.error || fallback;
   }
 

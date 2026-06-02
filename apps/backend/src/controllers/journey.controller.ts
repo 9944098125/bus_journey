@@ -157,6 +157,54 @@ export class JourneyController {
     }
   };
 
+  public async uploadDriverPhoto(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      if (!req.file) {
+        sendError(req, res, 400, "No file uploaded");
+        return;
+      }
+
+      const uploadedImage = await this.journeyService.uploadDriverPhoto(
+        req.file.buffer
+      );
+
+      sendItem(req, res, "Driver photo uploaded successfully", {
+        imageUrl: uploadedImage.secure_url,
+        publicId: uploadedImage.public_id,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async uploadDrivingLicense(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      if (!req.file) {
+        sendError(req, res, 400, "No file uploaded");
+        return;
+      }
+
+      const uploadedImage = await this.journeyService.uploadDrivingLicense(
+        req.file.buffer
+      );
+
+      sendItem(req, res, "Driving license uploaded successfully", {
+        imageUrl: uploadedImage.secure_url,
+        publicId: uploadedImage.public_id,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   private handleError(
     error: unknown,
     req: Request,

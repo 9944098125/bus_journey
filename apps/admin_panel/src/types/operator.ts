@@ -46,8 +46,7 @@ export type OperatorBusPayload = {
   total_seats: string;
   amenities: string;
   photos?: string[];
-  driver_photo?: string;
-  driving_license?: string;
+  source_location?: string;
 };
 
 export type OperatorPayload = {

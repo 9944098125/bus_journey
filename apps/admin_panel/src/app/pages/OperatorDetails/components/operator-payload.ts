@@ -8,12 +8,6 @@ export function validateOperatorBuses(
   if (!buses || buses.length === 0) {
     return 'An operator must have at least one bus.';
   }
-  if (buses.some(bus => !bus._id && !bus.driver_photo?.trim())) {
-    return 'Each new bus must have a driver photo before submitting.';
-  }
-  if (buses.some(bus => !bus._id && !bus.driving_license?.trim())) {
-    return 'Each new bus must have a driving license before submitting.';
-  }
   return null;
 }
 
@@ -41,8 +35,7 @@ export function buildOperatorPayload(
                 .map(a => a.trim())
                 .filter(Boolean)
             : bus.amenities,
-        driver_photo: bus.driver_photo?.trim() || undefined,
-        driving_license: bus.driving_license?.trim() || undefined,
+        source_location: bus.source_location?.trim() || undefined,
       })) || [],
   };
 }

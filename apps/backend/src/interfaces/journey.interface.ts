@@ -17,6 +17,8 @@ export interface IJourney extends Document {
   status: JourneyStatus;
   is_active: boolean;
   notes?: string;
+  driver_photo?: string;
+  driving_license?: string;
   created_by: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;

@@ -154,8 +154,7 @@ export function Operators() {
               ? bus.amenities.join(', ')
               : bus.amenities || '',
             photos: bus.photos || [],
-            driver_photo: bus.driver_photo || '',
-            driving_license: bus.driving_license || '',
+            source_location: bus.source_location || '',
           }))
         : [],
     });
@@ -176,13 +175,7 @@ export function Operators() {
     });
   };
 
-  const onBusDriverPhotoChange = (index: number, url: string) => {
-    onBusFieldChange(index, 'driver_photo', url);
-  };
 
-  const onBusDrivingLicenseChange = (index: number, url: string) => {
-    onBusFieldChange(index, 'driving_license', url);
-  };
 
   const removeBusPhoto = (busIndex: number, photoIndex: number) => {
     setFormState(prev => {
@@ -206,8 +199,7 @@ export function Operators() {
           total_seats: '',
           amenities: '',
           photos: [],
-          driver_photo: '',
-          driving_license: '',
+          source_location: '',
         }
       ]
     }));
@@ -244,29 +236,7 @@ export function Operators() {
       return;
     }
 
-    const busesMissingDriverPhoto = formState.buses.filter(
-      bus => !bus._id && !bus.driver_photo?.trim(),
-    );
-    if (busesMissingDriverPhoto.length > 0) {
-      toast({
-        title: 'Validation Error',
-        description: 'Each new bus must have a driver photo before submitting.',
-        variant: 'error',
-      });
-      return;
-    }
 
-    const busesMissingLicense = formState.buses.filter(
-      bus => !bus._id && !bus.driving_license?.trim(),
-    );
-    if (busesMissingLicense.length > 0) {
-      toast({
-        title: 'Validation Error',
-        description: 'Each new bus must have a driving license before submitting.',
-        variant: 'error',
-      });
-      return;
-    }
 
     try {
       const payload: OperatorPayload & { buses?: any[] } = {
@@ -287,8 +257,7 @@ export function Operators() {
               typeof bus.amenities === 'string'
                 ? bus.amenities.split(',').map(a => a.trim()).filter(Boolean)
                 : bus.amenities,
-            driver_photo: bus.driver_photo?.trim() || undefined,
-            driving_license: bus.driving_license?.trim() || undefined,
+            source_location: bus.source_location?.trim() || undefined,
           })) || [],
       };
       if (editingId) {
@@ -513,8 +482,6 @@ export function Operators() {
               onRemoveBus={removeBus}
               onBusFieldChange={onBusFieldChange}
               onBusPhotosChange={onBusPhotosChange}
-              onBusDriverPhotoChange={onBusDriverPhotoChange}
-              onBusDrivingLicenseChange={onBusDrivingLicenseChange}
               removeBusPhoto={removeBusPhoto}
             />
 

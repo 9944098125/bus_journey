@@ -19,6 +19,17 @@ export const formatErrors = (errors: any) => {
   if (typeof errors === 'string') {
     return errors;
   }
+  
+  // RTK Query wraps the response in data. The backend response has its own data envelope.
+  if (errors?.data?.data?.message) {
+    return errors.data.data.message;
+  }
+  
+  if (errors?.data && typeof errors.data === 'object') {
+    if (errors.data.message) return errors.data.message;
+    if (errors.data.error) return errors.data.error;
+  }
+  
   return errors?.message || errors?.error || 'Something went wrong';
 };
 

@@ -7,8 +7,7 @@ export interface IBus extends Document {
   total_seats: string;
   operator: Types.ObjectId;
   amenities: string[];
-  driver_photo?: string;
-  driving_license?: string;
+  source_location: string;
   photos: string[];
   is_active: boolean;
   created_by: Types.ObjectId;

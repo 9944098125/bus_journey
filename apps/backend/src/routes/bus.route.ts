@@ -14,23 +14,7 @@ router.use(requireAuth, requireAdmin);
  */
 router.post("/", busController.createBus.bind(busController));
 
-/**
- * Upload driver photo
- */
-router.post(
-  "/upload-driver-photo",
-  upload.single("driver_photo"),
-  busController.uploadDriverPhoto.bind(busController)
-);
 
-/**
- * Upload driving license
- */
-router.post(
-  "/upload-driving-license",
-  upload.single("driving_license"),
-  busController.uploadDrivingLicense.bind(busController)
-);
 
 /**
  * List buses

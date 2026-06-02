@@ -143,8 +143,7 @@ export class OperatorService {
           operator: operator._id,
           amenities: busData.amenities || [],
           photos: busData.photos || [],
-          driver_photo: busData.driver_photo?.trim() || undefined,
-          driving_license: busData.driving_license?.trim() || undefined,
+          source_location: busData.source_location?.trim() || "",
           is_active: busData.is_active ?? true,
           created_by: new mongoose.Types.ObjectId(createdById),
         });
@@ -324,8 +323,7 @@ export class OperatorService {
             total_seats: String(busData.total_seats).trim(),
             amenities: busData.amenities || [],
             photos: busData.photos || [],
-            driver_photo: busData.driver_photo?.trim() || undefined,
-            driving_license: busData.driving_license?.trim() || undefined,
+            source_location: busData.source_location?.trim() || "",
             is_active: busData.is_active ?? true,
           });
         } else {
@@ -337,8 +335,7 @@ export class OperatorService {
             operator: new mongoose.Types.ObjectId(id),
             amenities: busData.amenities || [],
             photos: busData.photos || [],
-            driver_photo: busData.driver_photo?.trim() || undefined,
-            driving_license: busData.driving_license?.trim() || undefined,
+            source_location: busData.source_location?.trim() || "",
             is_active: busData.is_active ?? true,
             created_by: existing.created_by,
           });

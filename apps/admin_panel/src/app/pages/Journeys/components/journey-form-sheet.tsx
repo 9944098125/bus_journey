@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, ImagePlus, FileBadge2 } from 'lucide-react';
 
 import { Button } from '../../../components/ui/button';
 import {
@@ -12,6 +12,7 @@ import { JourneyItem } from '../slice/types';
 import { JourneyFormFields } from './journey-form-fields';
 import { getJourneySeatsDisplay } from './journey-utils';
 import { useJourneyForm } from './use-journey-form';
+import { JourneyUploadField } from './journey-upload-field';
 
 interface JourneyFormSheetProps {
   open: boolean;
@@ -62,6 +63,38 @@ export function JourneyFormSheet({
             seatsDisplay={
               editingJourney ? getJourneySeatsDisplay(editingJourney) : undefined
             }
+          />
+
+          <JourneyUploadField
+            id="driver_photo_upload"
+            label="Driver Photo"
+            value={form.formData.driver_photo}
+            fileName={form.selectedDriverPhotoName}
+            error={form.driverPhotoUploadError}
+            uploading={form.isDriverPhotoUploading}
+            disabled={form.isSubmitting}
+            buttonText="Choose Driver Photo"
+            buttonClass="border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
+            previewClass="h-40 w-40"
+            placeholderIcon={ImagePlus}
+            onChange={form.onDriverPhotoChange}
+            onRemove={() => form.setFormData({ ...form.formData, driver_photo: '' })}
+          />
+
+          <JourneyUploadField
+            id="driving_license_upload"
+            label="Driving License"
+            value={form.formData.driving_license}
+            fileName={form.selectedLicenseName}
+            error={form.licenseUploadError}
+            uploading={form.isLicenseUploading}
+            disabled={form.isSubmitting}
+            buttonText="Choose Driving License"
+            buttonClass="border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+            previewClass="size-24"
+            placeholderIcon={FileBadge2}
+            onChange={form.onDrivingLicenseChange}
+            onRemove={() => form.setFormData({ ...form.formData, driving_license: '' })}
           />
 
           <div className="flex justify-end gap-3 pt-2">

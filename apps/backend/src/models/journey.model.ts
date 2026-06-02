@@ -69,6 +69,14 @@ const journeySchema = new Schema<IJourney>(
       trim: true,
     },
 
+    driver_photo: {
+      type: String,
+    },
+
+    driving_license: {
+      type: String,
+    },
+
     created_by: {
       type: Schema.Types.ObjectId,
       ref: "Users",

@@ -34,6 +34,38 @@ export class JourneyRepository {
     });
   }
 
+  public async findOverlappingJourney(busId: string, departureAt: Date, arrivalAt: Date, excludeJourneyId?: string) {
+    const query: Record<string, unknown> = {
+      bus: busId,
+      status: { $nin: ["cancelled"] },
+      departure_at: { $lt: arrivalAt },
+      arrival_at: { $gt: departureAt }
+    };
+
+    if (excludeJourneyId) {
+      query._id = { $ne: excludeJourneyId };
+    }
+
+    return Journeys.findOne(query).lean();
+  }
+
+  public async findLastJourneyBefore(busId: string, departureAt: Date, excludeJourneyId?: string) {
+    const query: Record<string, unknown> = {
+      bus: busId,
+      status: { $nin: ["cancelled"] },
+      departure_at: { $lte: departureAt }
+    };
+
+    if (excludeJourneyId) {
+      query._id = { $ne: excludeJourneyId };
+    }
+
+    return Journeys.findOne(query)
+      .sort({ departure_at: -1 })
+      .populate("route", ROUTE_POPULATE)
+      .lean();
+  }
+
   public async updateJourney(id: string, data: Partial<IJourney>) {
     return Journeys.findByIdAndUpdate(id, data, {
       new: true,

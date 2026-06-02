@@ -89,50 +89,7 @@ export const api = createApi({
       invalidatesTags: [{ type: 'Buses', id: 'LIST' }],
       transformErrorResponse: formatErrors,
     }),
-    uploadDriverPhoto: build.mutation<
-      { imageUrl: string; publicId: string },
-      File
-    >({
-      query: file => {
-        const formData = new FormData();
-        formData.append('driver_photo', file);
 
-        return {
-          ...endpoints.buses.uploadDriverPhoto,
-          body: formData,
-          prepareHeaders: (headers: Headers) => {
-            headers.delete('Content-Type');
-            return headers;
-          },
-        };
-      },
-      transformResponse: transformUploadResponse,
-      transformErrorResponse(baseQueryReturnValue) {
-        return formatErrors(baseQueryReturnValue.data);
-      },
-    }),
-    uploadDrivingLicense: build.mutation<
-      { imageUrl: string; publicId: string },
-      File
-    >({
-      query: file => {
-        const formData = new FormData();
-        formData.append('driving_license', file);
-
-        return {
-          ...endpoints.buses.uploadDrivingLicense,
-          body: formData,
-          prepareHeaders: (headers: Headers) => {
-            headers.delete('Content-Type');
-            return headers;
-          },
-        };
-      },
-      transformResponse: transformUploadResponse,
-      transformErrorResponse(baseQueryReturnValue) {
-        return formatErrors(baseQueryReturnValue.data);
-      },
-    }),
     uploadBusPhoto: build.mutation<
       { imageUrl: string; publicId: string },
       File
@@ -164,8 +121,6 @@ export const {
   useCreateBusMutation,
   useUpdateBusMutation,
   useDeleteBusMutation,
-  useUploadDriverPhotoMutation,
-  useUploadDrivingLicenseMutation,
   useUploadBusPhotoMutation,
 } = api;
 

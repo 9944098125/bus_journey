@@ -21,8 +21,6 @@ import {
 } from 'app/components/ui/select';
 import {
   useUploadBusPhotoMutation,
-  useUploadDriverPhotoMutation,
-  useUploadDrivingLicenseMutation,
 } from 'app/pages/Buses/slice';
 import type { OperatorBusPayload } from 'types/operator';
 
@@ -36,8 +34,6 @@ type OperatorBusesFormSectionProps = {
   onRemoveBus: (index: number) => void;
   onBusFieldChange: (index: number, field: string, value: string | number) => void;
   onBusPhotosChange: (index: number, urls: string[]) => void;
-  onBusDriverPhotoChange: (index: number, url: string) => void;
-  onBusDrivingLicenseChange: (index: number, url: string) => void;
   removeBusPhoto: (busIndex: number, photoIndex: number) => void;
 };
 
@@ -74,19 +70,11 @@ export function OperatorBusesFormSection({
   onRemoveBus,
   onBusFieldChange,
   onBusPhotosChange,
-  onBusDriverPhotoChange,
-  onBusDrivingLicenseChange,
   removeBusPhoto,
 }: OperatorBusesFormSectionProps) {
   const { toast } = useToast();
   const [uploadBusPhoto] = useUploadBusPhotoMutation();
-  const [uploadDriverPhoto, { isLoading: isDriverPhotoUploading }] =
-    useUploadDriverPhotoMutation();
-  const [uploadDrivingLicense, { isLoading: isLicenseUploading }] =
-    useUploadDrivingLicenseMutation();
   const [uploadingBusPhotosIndex, setUploadingBusPhotosIndex] = useState<number | null>(null);
-  const [uploadingBusDriverIndex, setUploadingBusDriverIndex] = useState<number | null>(null);
-  const [uploadingBusLicenseIndex, setUploadingBusLicenseIndex] = useState<number | null>(null);
   const [openBusItems, setOpenBusItems] = useState<string[]>([]);
   const previousBusCountRef = useRef(0);
 
@@ -138,65 +126,7 @@ export function OperatorBusesFormSection({
     }
   };
 
-  const handleBusDriverPhotoChange = async (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
 
-    const fileError = validateImageFile(file);
-    if (fileError) {
-      toast({ title: fileError, variant: 'error' });
-      return;
-    }
-
-    try {
-      setUploadingBusDriverIndex(index);
-      const uploadResult = await uploadDriverPhoto(file).unwrap();
-      onBusDriverPhotoChange(index, uploadResult.imageUrl);
-      toast({ title: 'Driver photo uploaded', variant: 'success' });
-    } catch (error) {
-      toast({
-        title: 'Failed to upload driver photo',
-        description: toErrorMessage(error, 'Please try again.'),
-        variant: 'error',
-      });
-    } finally {
-      setUploadingBusDriverIndex(null);
-      event.target.value = '';
-    }
-  };
-
-  const handleBusDrivingLicenseChange = async (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const fileError = validateImageFile(file);
-    if (fileError) {
-      toast({ title: fileError, variant: 'error' });
-      return;
-    }
-
-    try {
-      setUploadingBusLicenseIndex(index);
-      const uploadResult = await uploadDrivingLicense(file).unwrap();
-      onBusDrivingLicenseChange(index, uploadResult.imageUrl);
-      toast({ title: 'Driving license uploaded', variant: 'success' });
-    } catch (error) {
-      toast({
-        title: 'Failed to upload driving license',
-        description: toErrorMessage(error, 'Please try again.'),
-        variant: 'error',
-      });
-    } finally {
-      setUploadingBusLicenseIndex(null);
-      event.target.value = '';
-    }
-  };
 
   return (
     <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4">
@@ -345,107 +275,15 @@ export function OperatorBusesFormSection({
                     placeholder="e.g. WiFi, Water Bottle, Blanket"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor={`driver_photo_upload_${index}`}>Driver Photo</Label>
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                    <div className="h-14 w-14 overflow-hidden rounded-lg border bg-white">
-                      {bus.driver_photo ? (
-                        <img
-                          src={bus.driver_photo}
-                          alt={`Bus ${index} driver`}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-slate-400">
-                          <ImagePlus className="size-4" />
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-10 border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
-                      onClick={() =>
-                        document.getElementById(`driver_photo_upload_${index}`)?.click()
-                      }
-                      disabled={isDriverPhotoUploading && uploadingBusDriverIndex === index}
-                    >
-                      {isDriverPhotoUploading && uploadingBusDriverIndex === index ? (
-                        <Loader2 className="mr-2 size-4 animate-spin" />
-                      ) : (
-                        <UploadCloud className="mr-2 size-4" />
-                      )}
-                      Upload
-                    </Button>
-                    {bus.driver_photo && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-10 border-rose-200 text-rose-700 hover:bg-rose-50"
-                        onClick={() => onBusFieldChange(index, 'driver_photo', '')}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                    <input
-                      id={`driver_photo_upload_${index}`}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={event => void handleBusDriverPhotoChange(index, event)}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor={`driving_license_upload_${index}`}>Driving License</Label>
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                    <div className="h-14 w-14 overflow-hidden rounded-lg border bg-white">
-                      {bus.driving_license ? (
-                        <img
-                          src={bus.driving_license}
-                          alt={`Bus ${index} driving license`}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-slate-400">
-                          <FileBadge2 className="size-4" />
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-10 border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
-                      onClick={() =>
-                        document.getElementById(`driving_license_upload_${index}`)?.click()
-                      }
-                      disabled={isLicenseUploading && uploadingBusLicenseIndex === index}
-                    >
-                      {isLicenseUploading && uploadingBusLicenseIndex === index ? (
-                        <Loader2 className="mr-2 size-4 animate-spin" />
-                      ) : (
-                        <UploadCloud className="mr-2 size-4" />
-                      )}
-                      Upload
-                    </Button>
-                    {bus.driving_license && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-10 border-rose-200 text-rose-700 hover:bg-rose-50"
-                        onClick={() => onBusFieldChange(index, 'driving_license', '')}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                    <input
-                      id={`driving_license_upload_${index}`}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={event => void handleBusDrivingLicenseChange(index, event)}
-                    />
-                  </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor={`source_location_${index}`}>Source Location</Label>
+                  <Input
+                    id={`source_location_${index}`}
+                    className={fieldControlClass}
+                    value={bus.source_location}
+                    onChange={e => onBusFieldChange(index, 'source_location', e.target.value)}
+                    placeholder="e.g. Kakinada"
+                  />
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
                   <Label>Bus Photos</Label>

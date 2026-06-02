@@ -8,6 +8,26 @@ const journeyController = new JourneyController();
 
 router.use(requireAuth, requireAdmin);
 
+import { upload } from "../middlewares/upload.middleware.js";
+
+/**
+ * Upload driver photo
+ */
+router.post(
+  "/upload-driver-photo",
+  upload.single("driver_photo"),
+  journeyController.uploadDriverPhoto.bind(journeyController)
+);
+
+/**
+ * Upload driving license
+ */
+router.post(
+  "/upload-driving-license",
+  upload.single("driving_license"),
+  journeyController.uploadDrivingLicense.bind(journeyController)
+);
+
 /**
  * Create journey
  */

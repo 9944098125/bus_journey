@@ -41,12 +41,11 @@ const busesSchema = new Schema<IBus>(
       default: [],
     },
 
-    driver_photo: {
+    source_location: {
       type: String,
-    },
-
-    driving_license: {
-      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
     },
 
     photos: {

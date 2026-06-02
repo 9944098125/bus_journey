@@ -19,7 +19,6 @@ import {
 } from '../../../components/ui/sheet';
 import { Bus } from '../slice/types';
 import { useBusForm } from './use-bus-form';
-import { BusUploadField } from './bus-upload-field';
 import { BusPhotosField } from './bus-photos-field';
 
 const actionButtonBase =
@@ -137,38 +136,20 @@ export function BusFormSheet({ open, editingBus, onClose }: BusFormSheetProps) {
               placeholder="e.g. WiFi, Water Bottle, Blanket"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="source_location">Source Location</Label>
+            <Input
+              id="source_location"
+              value={formData.source_location}
+              required
+              onChange={e =>
+                setFormData({ ...formData, source_location: e.target.value })
+              }
+              placeholder="e.g. Kakinada"
+            />
+          </div>
 
-          <BusUploadField
-            id="driver_photo_upload"
-            label="Driver Photo"
-            value={formData.driver_photo}
-            fileName={form.selectedDriverPhotoName}
-            error={form.driverPhotoUploadError}
-            uploading={form.isDriverPhotoUploading}
-            disabled={busy}
-            buttonText="Choose Driver Photo"
-            buttonClass="border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
-            previewClass="h-40 w-40"
-            placeholderIcon={ImagePlus}
-            onChange={form.onDriverPhotoChange}
-            onRemove={() => setFormData({ ...formData, driver_photo: '' })}
-          />
 
-          <BusUploadField
-            id="driving_license_upload"
-            label="Driving License"
-            value={formData.driving_license}
-            fileName={form.selectedLicenseName}
-            error={form.licenseUploadError}
-            uploading={form.isLicenseUploading}
-            disabled={busy}
-            buttonText="Choose Driving License"
-            buttonClass="border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-            previewClass="size-24"
-            placeholderIcon={FileBadge2}
-            onChange={form.onDrivingLicenseChange}
-            onRemove={() => setFormData({ ...formData, driving_license: '' })}
-          />
 
           <BusPhotosField
             photos={formData.photos ?? []}

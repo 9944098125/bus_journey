@@ -93,6 +93,8 @@ export interface JourneyFormState {
   status: JourneyStatus;
   is_active: boolean;
   notes: string;
+  driver_photo: string;
+  driving_license: string;
 }
 
 export const EMPTY_JOURNEY_FORM: JourneyFormState = {
@@ -104,4 +106,6 @@ export const EMPTY_JOURNEY_FORM: JourneyFormState = {
   status: 'scheduled',
   is_active: true,
   notes: '',
+  driver_photo: '',
+  driving_license: '',
 };

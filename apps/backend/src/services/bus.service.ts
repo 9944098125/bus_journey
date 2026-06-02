@@ -41,6 +41,10 @@ export class BusService {
       throw new Error("Bus type is required");
     }
 
+    if (!data.source_location?.trim()) {
+      throw new Error("Source location is required");
+    }
+
     if (!data.total_seats?.trim()) {
       throw new Error("Total seats is required");
     }
@@ -97,8 +101,7 @@ export class BusService {
       total_seats: data.total_seats!.trim(),
       operator: data.operator,
       amenities: data.amenities || [],
-      driver_photo: data.driver_photo?.trim() || undefined,
-      driving_license: data.driving_license?.trim() || undefined,
+      source_location: data.source_location!.trim().toLowerCase(),
       is_active: data.is_active ?? true,
       created_by: new mongoose.Types.ObjectId(createdById),
     });
@@ -216,12 +219,11 @@ export class BusService {
       updatePayload.bus_type = updatePayload.bus_type.trim();
     }
 
-    if (updatePayload.driver_photo !== undefined) {
-      updatePayload.driver_photo = updatePayload.driver_photo.trim() || undefined;
-    }
-
-    if (updatePayload.driving_license !== undefined) {
-      updatePayload.driving_license = updatePayload.driving_license.trim() || undefined;
+    if (updatePayload.source_location !== undefined) {
+      if (!updatePayload.source_location.trim()) {
+        throw new Error("Source location cannot be empty");
+      }
+      updatePayload.source_location = updatePayload.source_location.trim().toLowerCase();
     }
 
     if (updatePayload.total_seats !== undefined) {
@@ -304,14 +306,6 @@ export class BusService {
 
       streamifier.createReadStream(fileBuffer).pipe(stream);
     });
-  }
-
-  public async uploadDriverPhoto(fileBuffer: Buffer) {
-    return this.uploadImageToCloudinary(fileBuffer, "driver-photos");
-  }
-
-  public async uploadDrivingLicense(fileBuffer: Buffer) {
-    return this.uploadImageToCloudinary(fileBuffer, "driving-licenses");
   }
 
   public async uploadBusPhoto(fileBuffer: Buffer) {

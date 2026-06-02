@@ -4,8 +4,6 @@ import { useToast } from '../../../components/ui/use-toast';
 import {
   useCreateBusMutation,
   useUpdateBusMutation,
-  useUploadDriverPhotoMutation,
-  useUploadDrivingLicenseMutation,
   useUploadBusPhotoMutation,
 } from '../slice';
 import { Bus } from '../slice/types';
@@ -18,8 +16,7 @@ export interface BusFormData {
   total_seats: string;
   operator: string;
   amenities: string;
-  driver_photo: string;
-  driving_license: string;
+  source_location: string;
   photos?: string[];
 }
 
@@ -30,8 +27,7 @@ const EMPTY_FORM: BusFormData = {
   total_seats: '25 seats',
   operator: '',
   amenities: '',
-  driver_photo: '',
-  driving_license: '',
+  source_location: '',
   photos: [],
 };
 
@@ -53,25 +49,13 @@ export function useBusForm({ editingBus, open, onClose }: UseBusFormArgs) {
 
   const [createBus, { isLoading: isCreating }] = useCreateBusMutation();
   const [updateBus, { isLoading: isUpdating }] = useUpdateBusMutation();
-  const [uploadDriverPhoto, { isLoading: isDriverPhotoUploading }] =
-    useUploadDriverPhotoMutation();
-  const [uploadDrivingLicense, { isLoading: isLicenseUploading }] =
-    useUploadDrivingLicenseMutation();
   const [uploadBusPhoto] = useUploadBusPhotoMutation();
 
   const [formData, setFormData] = useState<BusFormData>(EMPTY_FORM);
-  const [selectedDriverPhotoName, setSelectedDriverPhotoName] = useState('');
-  const [driverPhotoUploadError, setDriverPhotoUploadError] = useState('');
-  const [selectedLicenseName, setSelectedLicenseName] = useState('');
-  const [licenseUploadError, setLicenseUploadError] = useState('');
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   useEffect(() => {
     if (!open) return;
-    setSelectedDriverPhotoName('');
-    setDriverPhotoUploadError('');
-    setSelectedLicenseName('');
-    setLicenseUploadError('');
 
     if (editingBus) {
       setFormData({
@@ -81,8 +65,7 @@ export function useBusForm({ editingBus, open, onClose }: UseBusFormArgs) {
         total_seats: totalSeatsToSelectValue(editingBus.total_seats),
         operator: editingBus.operator?._id || '',
         amenities: editingBus.amenities.join(', '),
-        driver_photo: editingBus.driver_photo || '',
-        driving_license: editingBus.driving_license || '',
+        source_location: editingBus.source_location || '',
         photos: editingBus.photos || [],
       });
     } else {
@@ -90,66 +73,7 @@ export function useBusForm({ editingBus, open, onClose }: UseBusFormArgs) {
     }
   }, [open, editingBus]);
 
-  const onDriverPhotoChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const fileError = validateImageFile(file);
-    if (fileError) {
-      setDriverPhotoUploadError(fileError);
-      return;
-    }
-    setDriverPhotoUploadError('');
-    setSelectedDriverPhotoName(file.name);
-    try {
-      const uploadResult = await uploadDriverPhoto(file).unwrap();
-      setFormData(prev => ({ ...prev, driver_photo: uploadResult.imageUrl }));
-      toast({
-        variant: 'success',
-        title: 'Driver photo uploaded',
-        description: 'Image uploaded and ready to be saved.',
-      });
-    } catch (error: any) {
-      setDriverPhotoUploadError(
-        error?.data?.message || error?.message || 'Failed to upload photo.',
-      );
-    } finally {
-      event.target.value = '';
-    }
-  };
 
-  const onDrivingLicenseChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const fileError = validateImageFile(file);
-    if (fileError) {
-      setLicenseUploadError(fileError);
-      return;
-    }
-    setLicenseUploadError('');
-    setSelectedLicenseName(file.name);
-    try {
-      const uploadResult = await uploadDrivingLicense(file).unwrap();
-      setFormData(prev => ({
-        ...prev,
-        driving_license: uploadResult.imageUrl,
-      }));
-      toast({
-        variant: 'success',
-        title: 'Driving license uploaded',
-        description: 'Image uploaded and ready to be saved.',
-      });
-    } catch (error: any) {
-      setLicenseUploadError(
-        error?.data?.message || error?.message || 'Failed to upload license.',
-      );
-    } finally {
-      event.target.value = '';
-    }
-  };
 
   const onBusPhotosChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -182,18 +106,10 @@ export function useBusForm({ editingBus, open, onClose }: UseBusFormArgs) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingBus && !formData.driver_photo?.trim()) {
+    if (!formData.source_location?.trim()) {
       toast({
         title: 'Error',
-        description: 'Please upload a driver photo.',
-        variant: 'error',
-      });
-      return;
-    }
-    if (!editingBus && !formData.driving_license?.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please upload driving license.',
+        description: 'Please specify the source location.',
         variant: 'error',
       });
       return;
@@ -235,17 +151,9 @@ export function useBusForm({ editingBus, open, onClose }: UseBusFormArgs) {
   return {
     formData,
     setFormData,
-    selectedDriverPhotoName,
-    driverPhotoUploadError,
-    selectedLicenseName,
-    licenseUploadError,
     isUploadingPhotos,
     isCreating,
     isUpdating,
-    isDriverPhotoUploading,
-    isLicenseUploading,
-    onDriverPhotoChange,
-    onDrivingLicenseChange,
     onBusPhotosChange,
     removeBusPhoto,
     handleSubmit,

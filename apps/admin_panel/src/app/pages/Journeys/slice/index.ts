@@ -7,6 +7,7 @@ import {
   baseQuery,
   transformItemResponse,
   transformListResponse,
+  transformUploadResponse,
 } from 'utils/api/endpoints';
 import {
   JourneysState,
@@ -111,6 +112,50 @@ export const api = createApi({
         transformErrorResponse: formatErrors,
       },
     ),
+    uploadDriverPhoto: build.mutation<
+      { imageUrl: string; publicId: string },
+      File
+    >({
+      query: file => {
+        const formData = new FormData();
+        formData.append('driver_photo', file);
+
+        return {
+          ...endpoints.journeys.uploadDriverPhoto,
+          body: formData,
+          prepareHeaders: (headers: Headers) => {
+            headers.delete('Content-Type');
+            return headers;
+          },
+        };
+      },
+      transformResponse: transformUploadResponse,
+      transformErrorResponse(baseQueryReturnValue) {
+        return formatErrors(baseQueryReturnValue.data);
+      },
+    }),
+    uploadDrivingLicense: build.mutation<
+      { imageUrl: string; publicId: string },
+      File
+    >({
+      query: file => {
+        const formData = new FormData();
+        formData.append('driving_license', file);
+
+        return {
+          ...endpoints.journeys.uploadDrivingLicense,
+          body: formData,
+          prepareHeaders: (headers: Headers) => {
+            headers.delete('Content-Type');
+            return headers;
+          },
+        };
+      },
+      transformResponse: transformUploadResponse,
+      transformErrorResponse(baseQueryReturnValue) {
+        return formatErrors(baseQueryReturnValue.data);
+      },
+    }),
   }),
 });
 
@@ -120,6 +165,8 @@ export const {
   useCreateJourneyMutation,
   useUpdateJourneyMutation,
   useDeleteJourneyMutation,
+  useUploadDriverPhotoMutation,
+  useUploadDrivingLicenseMutation,
 } = api;
 
 export const useJourneysSlice = () => {

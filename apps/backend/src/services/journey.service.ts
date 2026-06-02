@@ -7,6 +7,9 @@ import { busRepository } from "../repositories/bus.repository.js";
 import { JourneyRepository } from "../repositories/journey.repository.js";
 import { RouteRepository } from "../repositories/route.repository.js";
 import { parseJourneySeatCapacity } from "../utils/seats.js";
+import streamifier from "streamifier";
+import type { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
 const JOURNEY_NOT_FOUND = "Journey not found";
 const INVALID_JOURNEY_ID = "Invalid journey id";
@@ -195,6 +198,7 @@ export class JourneyService {
     const bus = await this.getBusDocument(data.bus!.toString());
 
     const departure_at = this.parseDepartureAt(data.departure_at);
+
     const { arrival_at, available_seats } = await this.resolveArrivalAndSeats({
       route,
       bus,
@@ -205,6 +209,33 @@ export class JourneyService {
           : undefined,
       available_seats: data.available_seats,
     });
+
+    const overlapping = await this.journeyRepository.findOverlappingJourney(
+      bus._id.toString(),
+      departure_at,
+      arrival_at
+    );
+
+    if (overlapping) {
+      throw new Error("Bus is already scheduled for another journey during this time");
+    }
+
+    const lastJourney = await this.journeyRepository.findLastJourneyBefore(
+      bus._id.toString(),
+      departure_at
+    );
+
+    const expectedSource = lastJourney ? (lastJourney.route as any).destination_city.toLowerCase() : bus.source_location.toLowerCase();
+
+    if (route.source_city.toLowerCase() !== expectedSource) {
+      throw new Error(`Bus is currently at ${expectedSource} and cannot start a journey from ${route.source_city}`);
+    }
+
+    if (lastJourney && expectedSource !== bus.source_location.toLowerCase()) {
+      if (route.destination_city.toLowerCase() !== bus.source_location.toLowerCase()) {
+         throw new Error(`Bus must return to its base location (${bus.source_location}) from ${expectedSource}`);
+      }
+    }
 
     let journey_code = data.journey_code?.trim().toUpperCase();
 
@@ -238,6 +269,8 @@ export class JourneyService {
       status: this.normalizeStatus(data.status),
       is_active: data.is_active ?? true,
       notes: data.notes?.trim() || undefined,
+      driver_photo: data.driver_photo?.trim() || undefined,
+      driving_license: data.driving_license?.trim() || undefined,
       created_by: new mongoose.Types.ObjectId(createdById),
     });
 
@@ -441,6 +474,79 @@ export class JourneyService {
         ? this.parseDepartureAt(updatePayload.departure_at)
         : new Date(existing.departure_at);
 
+    let arrival_at = updatePayload.arrival_at !== undefined 
+        ? this.parseDepartureAt(updatePayload.arrival_at)
+        : new Date(existing.arrival_at);
+
+    let available_seats = updatePayload.available_seats ?? existing.available_seats;
+
+    const shouldRecalculateArrival =
+      updatePayload.departure_at !== undefined ||
+      updatePayload.route !== undefined;
+
+    const shouldResolveSeats =
+      updatePayload.bus !== undefined ||
+      updatePayload.available_seats !== undefined ||
+      shouldRecalculateArrival ||
+      updatePayload.arrival_at !== undefined;
+
+    if (shouldResolveSeats || shouldRecalculateArrival) {
+      const resolved = await this.resolveArrivalAndSeats(
+        {
+          route,
+          bus,
+          departure_at,
+          arrival_at:
+            updatePayload.arrival_at !== undefined
+              ? this.parseDepartureAt(updatePayload.arrival_at)
+              : shouldRecalculateArrival
+                ? undefined
+                : new Date(existing.arrival_at),
+          available_seats:
+            updatePayload.available_seats ?? existing.available_seats,
+        }
+      );
+
+      arrival_at = resolved.arrival_at;
+      available_seats = resolved.available_seats;
+
+      updatePayload.arrival_at = arrival_at;
+      updatePayload.available_seats = available_seats;
+    }
+
+    if (updatePayload.departure_at !== undefined || updatePayload.bus !== undefined || updatePayload.arrival_at !== undefined) {
+      const overlapping = await this.journeyRepository.findOverlappingJourney(
+        bus._id.toString(),
+        departure_at,
+        arrival_at,
+        id
+      );
+
+      if (overlapping) {
+        throw new Error("Bus is already scheduled for another journey during this time");
+      }
+    }
+
+    if (updatePayload.departure_at !== undefined || updatePayload.bus !== undefined || updatePayload.route !== undefined) {
+      const lastJourney = await this.journeyRepository.findLastJourneyBefore(
+        bus._id.toString(),
+        departure_at,
+        id
+      );
+
+      const expectedSource = lastJourney ? (lastJourney.route as any).destination_city.toLowerCase() : bus.source_location.toLowerCase();
+
+      if (route.source_city.toLowerCase() !== expectedSource) {
+        throw new Error(`Bus is currently at ${expectedSource} and cannot start a journey from ${route.source_city}`);
+      }
+
+      if (lastJourney && expectedSource !== bus.source_location.toLowerCase()) {
+        if (route.destination_city.toLowerCase() !== bus.source_location.toLowerCase()) {
+           throw new Error(`Bus must return to its base location (${bus.source_location}) from ${expectedSource}`);
+        }
+      }
+    }
+
     if (updatePayload.departure_at !== undefined) {
       updatePayload.departure_at = departure_at;
     }
@@ -459,35 +565,12 @@ export class JourneyService {
       updatePayload.notes = updatePayload.notes.trim() || undefined;
     }
 
-    const shouldRecalculateArrival =
-      updatePayload.departure_at !== undefined ||
-      updatePayload.route !== undefined;
+    if (updatePayload.driver_photo !== undefined) {
+      updatePayload.driver_photo = updatePayload.driver_photo.trim() || undefined;
+    }
 
-    const shouldResolveSeats =
-      updatePayload.bus !== undefined ||
-      updatePayload.available_seats !== undefined ||
-      shouldRecalculateArrival ||
-      updatePayload.arrival_at !== undefined;
-
-    if (shouldResolveSeats || shouldRecalculateArrival) {
-      const { arrival_at, available_seats } = await this.resolveArrivalAndSeats(
-        {
-          route,
-          bus,
-          departure_at,
-          arrival_at:
-            updatePayload.arrival_at !== undefined
-              ? this.parseDepartureAt(updatePayload.arrival_at)
-              : shouldRecalculateArrival
-                ? undefined
-                : new Date(existing.arrival_at),
-          available_seats:
-            updatePayload.available_seats ?? existing.available_seats,
-        }
-      );
-
-      updatePayload.arrival_at = arrival_at;
-      updatePayload.available_seats = available_seats;
+    if (updatePayload.driving_license !== undefined) {
+      updatePayload.driving_license = updatePayload.driving_license.trim() || undefined;
     }
 
     const updatedJourney = await this.journeyRepository.updateJourney(
@@ -512,5 +595,53 @@ export class JourneyService {
     }
 
     return deletedJourney;
+  }
+
+  private async uploadImageToCloudinary(
+    fileBuffer: Buffer,
+    folder: string
+  ): Promise<{
+    secure_url: string;
+    public_id: string;
+  }> {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder,
+          resource_type: "image",
+        },
+        (
+          error: UploadApiErrorResponse | undefined,
+          result: UploadApiResponse | undefined
+        ) => {
+          if (error || !result) {
+            reject(error);
+            return;
+          }
+
+          const imageUrl = result.secure_url ?? result.url;
+
+          if (!imageUrl) {
+            reject(new Error("Cloudinary upload did not return an image URL"));
+            return;
+          }
+
+          resolve({
+            secure_url: imageUrl,
+            public_id: result.public_id,
+          });
+        }
+      );
+
+      streamifier.createReadStream(fileBuffer).pipe(stream);
+    });
+  }
+
+  public async uploadDriverPhoto(fileBuffer: Buffer) {
+    return this.uploadImageToCloudinary(fileBuffer, "driver-photos");
+  }
+
+  public async uploadDrivingLicense(fileBuffer: Buffer) {
+    return this.uploadImageToCloudinary(fileBuffer, "driving-licenses");
   }
 }
