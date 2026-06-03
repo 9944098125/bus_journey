@@ -1,0 +1,50 @@
+1. BUILD MONOREPO
+
+- pnpm init
+- pnpm add -D turbo typescript
+
+2. CREATE A pnpm-workspace.yaml WITH CONTENT:
+
+packages:
+  - "apps/*"
+  - "packages/*"
+
+3. CREATE A turbo.json WITH CONTENT:
+
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**"]
+    },
+    "dev": {
+      "cache": false
+    },
+    "lint": {},
+    "test": {},
+    "typecheck": {}
+  }
+}
+
+4. IMPORT REPOS OF YOUR CHOOSEN ARCHITECTURE INTO THE /apps FOLDER 
+               OR
+   pnpm create next-app /apps/[app-name] FOR FRONTNED
+   pnpm create nestjs /apps/[app-name] FOR BACKEND
+
+5. pnpm add express cors dotenv
+   pnpm add -D typescript tsx @types/node
+
+6. ROOT package.json:
+
+{
+  "name": "repo",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  }
+}
