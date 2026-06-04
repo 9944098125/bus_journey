@@ -48,6 +48,10 @@ app.use(
 	}),
 );
 
+app.options("*", (req, res) => {
+	res.sendStatus(204);
+});
+
 /**
  * Compress response bodies
  */

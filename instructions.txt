@@ -105,3 +105,10 @@ CMD ["pnpm", "start"]
    - docker build -t backend .
    - docker tag backend:latest 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:latest
    - docker push 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:latest
+
+   or use 
+
+   docker buildx build \
+  --platform linux/amd64 \
+  -t 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:v5 \
+  --push .

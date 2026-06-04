@@ -11,6 +11,9 @@ app.get("/", (_, res) => {
 
 const PORT = Number(process.env.PORT) || 3000;
 
+console.log("FRONTEND_URL =", process.env.FRONTEND_URL);
+console.log("CORS CONFIG LOADED");
+
 app.listen(PORT, "0.0.0.0", () => {
 	console.log(`Server running on port ${PORT}`);
 });
