@@ -73,3 +73,35 @@ CMD ["pnpm", "start"]
 3. RUN - "docker run -p 5001:3000 backend"
 4. CHANGE THE BACKEND PORT TO 3000 IN .env
 5. RUN "docker run -p 3000:3000 backend" AND IF IT IS RUN FINE, THEN MOVE TO AWS ERC.
+6. OPEN AWS CONSOLE AND SEARCH FOR ECR AND SELECT "Elastic Container Registry" AND CREATE REPOSITORY
+7. AFTER CREATING REPOSITORY GO INSIDE THE REPO AND CLICK "View Command History" BUTTON IN THE TOP RIGHT CORNER
+8. INSTALL AWSCLI 
+9. NOW WE NEED TO CONFIGURE AWS AND FOR THAT WE NEED IAM > USERS AND IF NO USERS AVAILABLE, CREATE ONE.
+10.THEN CREATE ACCESS KEY FOR THE USER AND COPY THEM TO SOMEWHERE
+11.THEN RUN "aws configure"
+12.IN THAT COMMAND ITSELF IF ASKS FOR
+   ACCESS KEY - [YOUR ACCESS KEY]
+   SECRET KEY - [YOUR SECRET KEY]
+   DEFAULT REGION - ap-south-1
+   DEFAULT OUTPUT FORMAT - json
+13. AND THEN CHECK YOUR CREDENTIALS WITH - aws sts get-caller-identity
+   THEN YOU WILL GET THE CREDS LIKE 
+   {
+    "UserId": "AIDA2ZIONKGWWQK24Y2HX",
+    "Account": "741448962477",
+    "Arn": "arn:aws:iam::741448962477:user/bus_journey"
+  }
+13. NOW IN AWS CONSOLE > IAM > USERS > [THAT PARTICULAR USER]
+14. IN PERMISSIONS TAB ADD PERMISSIONS FROM RIGHT END OPTION
+15. IN THE NEXT PAGE SELECT "ATTACH POLICIES DIRECTLY"
+16. SEARCH FOR "AmazonEC2ContainerRegistryFullAccess" AND SELECT IT AND ADD IT TO PERMISSIONS
+17. THEN RUN "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 741448962477.dkr.ecr.ap-south-1.amazonaws.com" AFTER 30 SECONDS
+18. LOGIN SUCCESS
+19. START DOCKER AND ENTER COMMAND "docker ps" AND "docker images"
+20. AND THEN "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 741448962477.dkr.ecr.ap-south-1.amazonaws.com"
+21. AFTER LOGIN SUCCESS - docker tag backend:latest 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:latest
+22. NOW PUSH IT TO DOCKER - docker push 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:latest
+23. AFTER DOING SOME CHANGES TO PUSH THE UPDATED CODE TO DOCKER GO TO /apps/backend
+   - docker build -t backend .
+   - docker tag backend:latest 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:latest
+   - docker push 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:latest
