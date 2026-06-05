@@ -13,7 +13,10 @@ export class OperatorRepository {
 		});
 	}
 
-	public async findOperatorByPhoneNumber(country_code: string, phone_number: string) {
+	public async findOperatorByPhoneNumber(
+		country_code: string,
+		phone_number: string,
+	) {
 		return Operators.findOne({
 			country_code: country_code.trim(),
 			phone_number: phone_number.trim(),
@@ -21,12 +24,15 @@ export class OperatorRepository {
 	}
 
 	public async findOperatorById(id: string) {
-		return Operators.findById(id).populate("created_by", "full_name email role");
+		return Operators.findById(id).populate(
+			"created_by",
+			"full_name email role",
+		);
 	}
 
 	public async updateOperator(id: string, data: Partial<IOperator>) {
 		return Operators.findByIdAndUpdate(id, data, {
-			new: true,
+			returnDocument: "after",
 			runValidators: true,
 		}).populate("created_by", "full_name email role");
 	}
@@ -35,7 +41,9 @@ export class OperatorRepository {
 		return Operators.findByIdAndDelete(id);
 	}
 
-	public async getAllOperators(filters: Partial<Pick<IOperator, "is_active">> & { search?: string } = {}) {
+	public async getAllOperators(
+		filters: Partial<Pick<IOperator, "is_active">> & { search?: string } = {},
+	) {
 		const query: any = {};
 
 		if (typeof filters.is_active === "boolean") {
@@ -49,7 +57,7 @@ export class OperatorRepository {
 				{ email: searchRegex },
 				{ phone_number: searchRegex },
 				{ address: searchRegex },
-				{ gst_number: searchRegex }
+				{ gst_number: searchRegex },
 			];
 		}
 

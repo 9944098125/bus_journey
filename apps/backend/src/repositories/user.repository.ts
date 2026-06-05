@@ -66,7 +66,7 @@ export class UserRepository {
 		return Users.findByIdAndUpdate(
 			id,
 			{ is_verified: true, last_login_at: new Date() },
-			{ new: true, runValidators: true },
+			{ returnDocument: "after", runValidators: true },
 		).select("-password");
 	}
 
@@ -74,7 +74,7 @@ export class UserRepository {
 		return Users.findByIdAndUpdate(
 			id,
 			{ last_login_at: new Date() },
-			{ new: true, runValidators: true },
+			{ returnDocument: "after", runValidators: true },
 		).select("-password");
 	}
 
@@ -84,7 +84,7 @@ export class UserRepository {
 
 	public async updateUser(id: string, data: Partial<IUser>) {
 		return Users.findByIdAndUpdate(id, data, {
-			new: true,
+			returnDocument: "after",
 			runValidators: true,
 		}).select("-password");
 	}
@@ -108,7 +108,10 @@ export class UserRepository {
 			createdAt: -1,
 		});
 
-		console.log("[DEBUG] UserRepository.getAllUsers — done, count:", users.length);
+		console.log(
+			"[DEBUG] UserRepository.getAllUsers — done, count:",
+			users.length,
+		);
 
 		return users;
 	}

@@ -110,5 +110,33 @@ CMD ["pnpm", "start"]
 
    docker buildx build \
   --platform linux/amd64 \
-  -t 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:v5 \
+  -t 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:v14 \
   --push .
+  NOTE: CHANGE THE VERSION FOR EACH PUSH
+24. AFTER DEPLOYMENT FINISHES YOU CAN CHECK IF THE PUSHED IMAGE RUNNING IN AWS WITH THESE COMMANDS
+   - curl https://bu-7717123497744cc18c3c636689d549a8.ecs.ap-south-1.on.aws/debug-version
+   returns {"version":[your version in code]}
+   - CHECK ECS TASK IMAGE:
+  aws ecs list-tasks \
+  --cluster default \
+  --region ap-south-1
+
+  THEN:
+  aws ecs describe-tasks \
+  --cluster default \
+  --tasks <TASK_ARN> \
+  --region ap-south-1 \
+  --query 'tasks[].containers[].image'
+
+  EXPECTED: 741448962477.dkr.ecr.ap-south-1.amazonaws.com/bus_journey:v11
+
+  VERIFY IF THE PUSHED IMAGE EXISTS IN THE ECR:
+  aws ecr describe-images \
+  --repository-name bus_journey \
+  --image-ids imageTag=v11 \
+  --region ap-south-1
+
+  EXPECTED:
+  {
+  "imageTags": [YOUR VERSION]
+  }

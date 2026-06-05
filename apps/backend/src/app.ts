@@ -14,6 +14,7 @@ import busesRoutes from "./routes/bus.route.js";
 import routesRoutes from "./routes/route.route.js";
 
 import journeysRoutes from "./routes/journey.route.js";
+import healthRouter from "./routes/health.route.js";
 
 import { sendError } from "./utils/api-response.js";
 
@@ -41,16 +42,36 @@ app.use(helmet());
  * Enable CORS
  */
 
+app.use((req, res, next) => {
+	if (req.method === "OPTIONS") {
+		console.log("Deploment version v14");
+		res.setHeader(
+			"Access-Control-Allow-Origin",
+			process.env.FRONTEND_URL || "http://localhost:3000",
+		);
+		res.setHeader("Access-Control-Allow-Credentials", "true");
+		res.setHeader(
+			"Access-Control-Allow-Headers",
+			"Content-Type, Authorization",
+		);
+		res.setHeader(
+			"Access-Control-Allow-Methods",
+			"GET,POST,PUT,PATCH,DELETE,OPTIONS",
+		);
+
+		res.status(204).end();
+		return;
+	}
+
+	next();
+});
+
 app.use(
 	cors({
 		origin: process.env.FRONTEND_URL,
 		credentials: true,
 	}),
 );
-
-app.options("*", (req, res) => {
-	res.sendStatus(204);
-});
 
 /**
  * Compress response bodies
@@ -90,6 +111,8 @@ app.get("/", (_req, res) => {
 /**
  * API routes
  */
+
+app.use("/health", healthRouter);
 
 app.use("/api/users", usersRoutes);
 

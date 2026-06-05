@@ -1,19 +1,35 @@
-import express from "express";
-import healthRouter from "./routes/health.route.js";
+import "dotenv/config";
 
-const app = express();
+import type { Server } from "http";
 
-app.use("/health", healthRouter);
-
-app.get("/", (_, res) => {
-	res.send("API Running");
-});
+import app from "./app.js";
+import { connectDatabase } from "./config/database.js";
+import { getMailTransporter } from "./config/mailer.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 
-console.log("FRONTEND_URL =", process.env.FRONTEND_URL);
-console.log("CORS CONFIG LOADED");
+const startServer = async (): Promise<void> => {
+	try {
+		console.log("============ STARTING V14");
 
-app.listen(PORT, "0.0.0.0", () => {
-	console.log(`Server running on port ${PORT}`);
-});
+		await connectDatabase();
+
+		try {
+			await getMailTransporter().verify();
+			console.log("SMTP ready");
+		} catch (error) {
+			console.warn("SMTP not ready:", error);
+		}
+
+		const server: Server = app.listen(PORT, "0.0.0.0", () => {
+			console.log(`Server running on port ${PORT}`);
+		});
+
+		console.log("Server started:", server.address());
+	} catch (error) {
+		console.error("Startup failed:", error);
+		process.exit(1);
+	}
+};
+
+void startServer();
