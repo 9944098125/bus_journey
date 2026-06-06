@@ -1,34 +1,104 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<App /> should render and match the snapshot 1`] = `
-<BrowserRouter>
-  <Helmet
-    defaultTitle="Appening React Boilerplate"
-    defer={true}
-    encodeSpecialCharacters={true}
-    htmlAttributes={
-      Object {
-        "lang": undefined,
+<React.Fragment>
+  <Toaster />
+  <BrowserRouter>
+    <Helmet
+      defaultTitle="Bus Journey App"
+      defer={true}
+      encodeSpecialCharacters={true}
+      htmlAttributes={
+        Object {
+          "lang": "en",
+        }
       }
-    }
-    prioritizeSeoTags={false}
-    titleTemplate="%s - Appening React Boilerplate"
-  >
-    <meta
-      content="A Appening React Boilerplate application"
-      name="description"
-    />
-  </Helmet>
-  <Routes>
-    <Route
-      element={<Unknown />}
-      path="/"
-    />
-    <Route
-      element={<Unknown />}
-      path="*"
-    />
-  </Routes>
-  <Memo(l) />
-</BrowserRouter>
+      prioritizeSeoTags={false}
+      titleTemplate="%s - Bus Journey App"
+    >
+      <meta
+        content="Bus Journey App"
+        name="description"
+      />
+    </Helmet>
+    <Routes>
+      <Route
+        element={<Layout />}
+      >
+        <Route
+          element={<Unknown />}
+          path="/register"
+        />
+      </Route>
+      <Route
+        element={<RedirectIfAuth />}
+      >
+        <Route
+          element={<Layout />}
+        >
+          <Route
+            element={<Unknown />}
+            path="/login"
+          />
+        </Route>
+      </Route>
+      <Route
+        element={<Layout />}
+      >
+        <Route
+          element={<Unknown />}
+          path="/"
+        />
+        <Route
+          element={<RequireAuth />}
+        >
+          <Route
+            element={<Unknown />}
+            path="/buses"
+          />
+          <Route
+            element={<Unknown />}
+            path="/bookings"
+          />
+          <Route
+            element={<Unknown />}
+            path="/bookings/upcoming"
+          />
+          <Route
+            element={<Unknown />}
+            path="/bookings/history"
+          />
+          <Route
+            element={<Unknown />}
+            path="/saved-routes"
+          />
+          <Route
+            element={<Unknown />}
+            path="/rewards"
+          />
+          <Route
+            element={<Unknown />}
+            path="/wallet"
+          />
+          <Route
+            element={<Unknown />}
+            path="/notifications"
+          />
+          <Route
+            element={<Unknown />}
+            path="/profile"
+          />
+          <Route
+            element={<Unknown />}
+            path="/payment-methods"
+          />
+        </Route>
+        <Route
+          element={<Unknown />}
+          path="*"
+        />
+      </Route>
+    </Routes>
+  </BrowserRouter>
+</React.Fragment>
 `;

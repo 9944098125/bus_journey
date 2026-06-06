@@ -12,8 +12,8 @@ describe('configure-store', () => {
     );
   });
 
-  it('should return an empty store', () => {
+  it('should return a store with valid state', () => {
     const store = configureAppStore();
-    expect(store.getState()).toBeUndefined();
+    expect(store.getState()).toEqual(expect.any(Object));
   });
 });
