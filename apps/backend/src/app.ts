@@ -42,34 +42,17 @@ app.use(helmet());
  * Enable CORS
  */
 
-app.use((req, res, next) => {
-	if (req.method === "OPTIONS") {
-		console.log("Deploment version v14");
-		res.setHeader(
-			"Access-Control-Allow-Origin",
-			process.env.FRONTEND_URL || "http://localhost:3000",
-		);
-		res.setHeader("Access-Control-Allow-Credentials", "true");
-		res.setHeader(
-			"Access-Control-Allow-Headers",
-			"Content-Type, Authorization",
-		);
-		res.setHeader(
-			"Access-Control-Allow-Methods",
-			"GET,POST,PUT,PATCH,DELETE,OPTIONS",
-		);
-
-		res.status(204).end();
-		return;
-	}
-
-	next();
-});
+const allowedOrigins = [
+	process.env.FRONTEND_URL || "http://localhost:3000",
+	process.env.ADMIN_PANEL_URL || "http://localhost:3001",
+];
 
 app.use(
 	cors({
-		origin: process.env.FRONTEND_URL,
+		origin: allowedOrigins,
 		credentials: true,
+		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization"],
 	}),
 );
 
