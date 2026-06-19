@@ -23,6 +23,7 @@ export type Operator = {
 export type OperatorListResponse = {
   success: boolean;
   count: number;
+  total?: number;
   data: Operator[];
 };
 
@@ -44,9 +45,11 @@ export type OperatorBusPayload = {
   bus_number: string;
   bus_type: string;
   total_seats: string;
-  amenities: string;
+  amenities: string | string[];
   photos?: string[];
   source_location?: string;
+  driver_photo?: string;
+  driving_license?: string;
 };
 
 export type OperatorPayload = {

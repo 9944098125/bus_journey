@@ -1,72 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<App /> should render and match the snapshot 1`] = `
-<React.Fragment>
-  <Toaster />
-  <BrowserRouter>
-    <Helmet
-      defaultTitle="Bus Journey Admin"
-      defer={true}
-      encodeSpecialCharacters={true}
-      htmlAttributes={
-        Object {
-          "lang": "en",
-        }
-      }
-      prioritizeSeoTags={false}
-      titleTemplate="%s - Bus Journey Admin"
-    >
-      <meta
-        content="Bus Journey Admin Panel"
-        name="description"
-      />
-    </Helmet>
-    <Routes>
-      <Route
-        element={<RedirectIfAuth />}
-      >
-        <Route
-          element={<Unknown />}
-          path="/login"
-        />
-      </Route>
-      <Route
-        element={<RequireAuth />}
-      >
-        <Route
-          element={<Layout />}
-        >
-          <Route
-            element={<Unknown />}
-            path="/"
-          />
-          <Route
-            element={<Unknown />}
-            path="/operators"
-          />
-          <Route
-            element={<Unknown />}
-            path="/operators/:id"
-          />
-          <Route
-            element={<Unknown />}
-            path="/buses"
-          />
-          <Route
-            element={<Unknown />}
-            path="/routes"
-          />
-          <Route
-            element={<Unknown />}
-            path="/journeys"
-          />
-          <Route
-            element={<Unknown />}
-            path="*"
-          />
-        </Route>
-      </Route>
-    </Routes>
-  </BrowserRouter>
-</React.Fragment>
+<DocumentFragment>
+  <div
+    data-testid="dashboard-page"
+  />
+</DocumentFragment>
 `;

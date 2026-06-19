@@ -240,6 +240,14 @@ export const endpoints = {
       url: '/journeys',
       method: HTTP_METHODS.POST,
     },
+    uploadDriverPhoto: {
+      url: '/journeys/upload-driver-photo',
+      method: HTTP_METHODS.POST,
+    },
+    uploadDrivingLicense: {
+      url: '/journeys/upload-driving-license',
+      method: HTTP_METHODS.POST,
+    },
     byId: (id: string) => ({
       url: `/journeys/${id}`,
       method: HTTP_METHODS.GET,

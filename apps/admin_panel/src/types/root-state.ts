@@ -3,6 +3,7 @@ import type { DashboardState } from 'app/pages/Dashboard/slice/types';
 import type { OperatorsState } from 'app/pages/Operators/slice/types';
 import type { RoutesState } from 'app/pages/Routes/slice/types';
 import type { JourneysState } from 'app/pages/Journeys/slice/types';
+import type { BusesState } from 'app/pages/Buses/slice/types';
 
 /*
   Because redux-injectors registers reducers asynchronously, declare keys here manually.
@@ -24,4 +25,7 @@ export interface RootState {
   /** Journeys RTK Query cache (injected via useJourneysSlice) */
   journeysApi?: any;
   journeys?: JourneysState;
+  /** Buses RTK Query cache (injected via useBusesSlice) */
+  busesApi?: any;
+  buses?: BusesState;
 }

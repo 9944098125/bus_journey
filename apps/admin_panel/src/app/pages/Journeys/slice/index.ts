@@ -32,7 +32,8 @@ export const api = createApi({
   tagTypes: ['Journeys', 'Journey'],
   endpoints: build => ({
     getJourneys: build.query<GetJourneysResponse, GetJourneysQueryArg | void>({
-      query: (arg = {}) => {
+      query: (input = {}) => {
+        const arg: GetJourneysQueryArg = input || {};
         const params = new URLSearchParams();
         if (arg.page) params.append('page', arg.page.toString());
         if (arg.limit) params.append('limit', arg.limit.toString());

@@ -31,7 +31,8 @@ export const api = createApi({
   tagTypes: ['Routes', 'Route'],
   endpoints: build => ({
     getRoutes: build.query<GetRoutesResponse, GetRoutesQueryArg | void>({
-      query: (arg = {}) => {
+      query: (input = {}) => {
+        const arg: GetRoutesQueryArg = input || {};
         const params = new URLSearchParams();
         if (arg.page) params.append('page', arg.page.toString());
         if (arg.limit) params.append('limit', arg.limit.toString());

@@ -17,6 +17,14 @@
 		"overrides": {
 			"webpack": "5.107.1",
 			"@types/minimatch": "5.1.2"
+		},
+		"peerDependencyRules": {
+			"allowedVersions": {
+				"react": "19",
+				"react-dom": "19",
+				"react-redux": "9",
+				"typescript": "5"
+			}
 		}
 	},
 	"devDependencies": {

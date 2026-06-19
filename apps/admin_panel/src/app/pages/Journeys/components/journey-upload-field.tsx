@@ -34,7 +34,7 @@ export function JourneyUploadField({
   placeholderIcon: PlaceholderIcon,
   onChange,
   onRemove,
-}: BusUploadFieldProps) {
+}: JourneyUploadFieldProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>

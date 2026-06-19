@@ -25,7 +25,8 @@ export const api = createApi({
   tagTypes: ['Buses', 'Bus'],
   endpoints: build => ({
     getBuses: build.query<GetBusesResponse, GetBusesQueryArg | void>({
-      query: (arg = {}) => {
+      query: (input = {}) => {
+        const arg: GetBusesQueryArg = input || {};
         const params = new URLSearchParams();
         if (arg.page) params.append('page', arg.page.toString());
         if (arg.limit) params.append('limit', arg.limit.toString());

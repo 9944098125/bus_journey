@@ -1,18 +1,21 @@
 import React from 'react';
 
+import { cn } from 'utils/twm';
+
 type Props = {
-  htmlFor: string;
+  htmlFor?: string;
   children: React.ReactNode;
   dark?: boolean;
+  className?: string;
 };
 const Label = (props: Props) => {
-  const { htmlFor, children, dark } = props;
+  const { htmlFor, children, dark, className } = props;
   return (
     <React.Fragment>
       <label
         style={{ color: dark ? 'white' : '' }}
         htmlFor={htmlFor}
-        className="text-[14px] font-medium font-poppins"
+        className={cn('text-[14px] font-medium font-poppins', className)}
       >
         {children}
       </label>

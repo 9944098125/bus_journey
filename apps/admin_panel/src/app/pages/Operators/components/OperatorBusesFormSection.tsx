@@ -34,6 +34,8 @@ type OperatorBusesFormSectionProps = {
   onRemoveBus: (index: number) => void;
   onBusFieldChange: (index: number, field: string, value: string | number) => void;
   onBusPhotosChange: (index: number, urls: string[]) => void;
+  onBusDriverPhotoChange?: (index: number, url: string) => void;
+  onBusDrivingLicenseChange?: (index: number, url: string) => void;
   removeBusPhoto: (busIndex: number, photoIndex: number) => void;
 };
 

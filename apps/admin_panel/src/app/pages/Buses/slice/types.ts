@@ -10,6 +10,8 @@ export interface Bus {
   amenities: string[];
   source_location: string;
   photos?: string[];
+  driver_photo?: string;
+  driving_license?: string;
   is_active: boolean;
   created_by: string;
   createdAt: string;

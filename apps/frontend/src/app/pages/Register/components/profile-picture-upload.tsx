@@ -6,7 +6,7 @@ import { cn } from 'utils/twm';
 import { ACCEPTED_IMAGE_TYPES } from './constants';
 
 type ProfilePictureUploadProps = {
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
   previewUrl: string | null;
   selectedImage: File | null;
   imageError: string | null;

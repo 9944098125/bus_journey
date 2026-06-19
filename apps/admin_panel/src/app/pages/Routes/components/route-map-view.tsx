@@ -7,7 +7,7 @@ import {
   Tooltip,
   useMap,
 } from 'react-leaflet';
-import type { LatLngExpression } from 'leaflet';
+import { latLngBounds, type LatLngExpression } from 'leaflet';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -22,7 +22,7 @@ function FitRouteBounds({ positions }: { positions: LatLngExpression[] }) {
 
   useEffect(() => {
     if (positions.length > 0) {
-      map.fitBounds(positions, { padding: [48, 48] });
+      map.fitBounds(latLngBounds(positions), { padding: [48, 48] });
     }
   }, [map, positions]);
 
